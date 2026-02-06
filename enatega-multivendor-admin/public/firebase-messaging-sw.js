@@ -8,9 +8,9 @@ importScripts(
 
 firebase.initializeApp({
   apiKey: 'AIzaSyDx_iSQ9LroTF7NMm20aRvw2wJqhwSnJ3U',
-  authDomain: 'enatega-multivender-web.firebaseapp.com',
-  projectId: 'enatega-multivender-web',
-  storageBucket: 'enatega-multivender-web.firebasestorage.app',
+  authDomain: 'ZAS-multivender-web.firebaseapp.com',
+  projectId: 'ZAS-multivender-web',
+  storageBucket: 'ZAS-multivender-web.firebasestorage.app',
   messagingSenderId: '438532750182',
   appId: '1:438532750182:web:516b850eff4e0349f0a6a7',
   measurementId: 'G-KLBJSEHRYQ',

@@ -92,7 +92,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "enatega.com",
+        hostname: "zas.app",
       },
       {
         protocol: "https",
@@ -140,7 +140,7 @@ const nextConfig = {
       },
        {
         protocol: 'https',
-        hostname: 'enatega-backend.s3.eu-north-1.amazonaws.com',
+        hostname: 'zas-backend.s3.eu-north-1.amazonaws.com',
       },
       {
         protocol: 'https',

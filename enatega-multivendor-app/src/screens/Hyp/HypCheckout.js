@@ -73,7 +73,7 @@ function HypCheckout(props) {
             variables: {
               groupId: await AsyncStorage.getItem('hyp-session-id'),
               module: 'HypCheckout',
-              screenPath: '/Users/umarkhalid/Projects/Yalla/yalla-apps/enatega-multivendor-app/src/screens/Hyp/HypCheckout.js',
+              screenPath: '/Users/umarkhalid/Projects/Yalla/yalla-apps/ZAS-multivendor-app/src/screens/Hyp/HypCheckout.js',
               type,
               details
             }

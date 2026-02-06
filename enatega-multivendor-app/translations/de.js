@@ -1,4 +1,4 @@
-export const de = {
+﻿export const de = {
   title0: 'Ausgewählte Sprache',
   subtitle0: 'Englisch',
   description0:
@@ -288,7 +288,7 @@ secureAccountWithPhone: 'Wir verwenden Ihre Nummer nur, wenn wir Sie bezüglich 
   useCurrentLocation: 'aktuellen Standort verwenden',
   locationPermissionMessage:
     'Tippen Sie auf diese Nachricht, um die Einstellungen zu öffnen und der App die Verwendung des Standorts zu erlauben.',
-  enategaUseYourLocationMessage:
+  ZASUseYourLocationMessage:
     'Yalla verwendet Ihren Standort, um die Restaurants in Ihrer Nähe anzuzeigen!',
   selectAnotherLocation: 'Wählen Sie einen anderen Ort aus',
   setLocation: 'Standort festlegen',
@@ -589,8 +589,8 @@ secureAccountWithPhone: 'Wir verwenden Ihre Nummer nur, wenn wir Sie bezüglich 
     'Melden Sie sich einfach an, indem Sie Ihre E-Mail-Adresse eingeben!',
   yourEmailPassword:
     'Bitte geben Sie jetzt Ihr Passwort ein, um Zugriff zu erhalten!',
-    brandName: 'Enatega',
-    welcomeText: 'Willkommen bei Enatega',
+    brandName: 'ZAS',
+    welcomeText: 'Willkommen bei ZAS',
   createAccountDesc:
     'Genießen Sie die besten Restaurants oder erhalten Sie, was Sie von nahegelegenen Geschäften benötigen, geliefert!',
     phoneNumber: 'Telefonnummer',

@@ -1,4 +1,4 @@
-export const te = {
+﻿export const te = {
     title0: 'ఎంచుకున్న భాష',
     subtitle0: 'తెలుగు',
     description0:
@@ -283,7 +283,7 @@ export const te = {
     useCurrentLocation: 'ప్రస్తుత స్థానాన్ని ఉపయోగించండి',
     locationPermissionMessage:
       'సెట్టింగ్‌లను తెరవడానికి ఈ సందేశంపై ట్యాప్ చేయండి, ఆపై అప్లికేషన్‌కు స్థాన అనుమతులను అనుమతించండి.',
-    enategaUseYourLocationMessage:
+    ZASUseYourLocationMessage:
       'మీ సమీపంలోని రెస్టారెంట్లను కనుగొనడానికి మాకు మీ స్థానం మాత్రమే అవసరం',
     selectAnotherLocation: 'స్థానాన్ని మాన్యువల్‌గా సెట్ చేయండి',
     setLocation: 'స్థానాన్ని సెట్ చేయండి',

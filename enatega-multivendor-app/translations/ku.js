@@ -1,4 +1,4 @@
-export const ku = {
+﻿export const ku = {
     title0: 'زمانی هەڵبژێردراو',
     subtitle0: 'ئینگلیزی',
     description0: 'هەر زمانێک کە دەتەوێت هەڵبژێرە بۆ گۆڕینی ناوەڕۆکی ئەپەکە بۆ زمانی داواکراوی تۆ.',
@@ -265,7 +265,7 @@ export const ku = {
     currentLocation: 'شوێنی ئێستا',
     useCurrentLocation: 'شوێنی ئێستا بەکاربهێنە',
     locationPermissionMessage: 'کرتە بکە لەسەر ئەم پەیامە بۆ کردنەوەی ڕێکخستنەکان، پاشان مۆڵەت بدە بە ئەپەکە بۆ بەکارهێنانی شوێن لە مۆڵەتەکان.',
-    enategaUseYourLocationMessage: 'بۆ دۆزینەوەی چێشتخانەکان لە نزیکت، تەنها پێویستمان بە شوێنەکەتە',
+    ZASUseYourLocationMessage: 'بۆ دۆزینەوەی چێشتخانەکان لە نزیکت، تەنها پێویستمان بە شوێنەکەتە',
     selectAnotherLocation: 'شوێنێکی تر دیاری بکە بە دەستی',
     setLocation: 'شوێن دیاری بکە',
     cartIsEmpty: 'سەبەتە بەتاڵە',

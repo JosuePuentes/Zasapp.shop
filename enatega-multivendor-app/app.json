@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Enatega Multi",
-    "scheme": "enategamultivendor",
+    "name": "Zas",
+    "scheme": "zas",
     "version": "1.1.3",
-    "description": "Enatega is a starter kit food ordering app built in React Native using Expo for IOS and Android. It's made keeping good aesthetics in mind as well keeping the best coding practices in mind. Its fully customisable to easily help you in your next food delivery project. https://market.nativebase.io/view/react-native-food-delivery-backend-app",
-    "slug": "enategamultivendor",
+    "description": "Zas is a food ordering app built in React Native using Expo for IOS and Android. It's made keeping good aesthetics in mind as well keeping the best coding practices in mind. Its fully customisable to easily help you in your next food delivery project. https://market.nativebase.io/view/react-native-food-delivery-backend-app",
+    "slug": "zas",
     "owner": "ninjas_code",
     "experiments": {
       "buildCacheProvider": "eas"
@@ -33,7 +33,7 @@
       },
       "supportsTablet": true,
       "userInterfaceStyle": "automatic",
-      "bundleIdentifier": "com.enatega.multivendor",
+      "bundleIdentifier": "com.ZAS.multivendor",
       "icon": "./assets/icon.png",
       "config": {
         "googleMapsApiKey": "AIzaSyCcm7_Wd7uvmC9YnYLu2JHGWPt6z1MaL1E"
@@ -56,11 +56,11 @@
       "color": "#90E36D",
       "icon": "./assets/not-icon.png",
       "androidMode": "default",
-      "androidCollapsedTitle": "Enatega Multivendor"
+      "androidCollapsedTitle": "Zas"
     },
     "android": {
       "versionCode": 103,
-      "package": "com.enatega.multivendor",
+      "package": "com.ZAS.multivendor",
       "userInterfaceStyle": "automatic",
       "googleServicesFile": "./google-services.json",
       "splash": {
@@ -110,7 +110,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow $Enatega Multivendor to use your location."
+          "locationAlwaysAndWhenInUsePermission": "Allow Zas to use your location."
         }
       ],
       "expo-font",

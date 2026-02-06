@@ -1,4 +1,4 @@
-export const mr = {
+﻿export const mr = {
     title0: 'निवडलेली भाषा',
     subtitle0: 'मराठी',
     description0:
@@ -283,7 +283,7 @@ export const mr = {
     useCurrentLocation: 'सध्याचे स्थान वापरा',
     locationPermissionMessage:
       'सेटिंग्ज उघडण्यासाठी या संदेशावर टॅप करा, नंतर अॅपला स्थान परवानगी द्या.',
-    enategaUseYourLocationMessage:
+    ZASUseYourLocationMessage:
       'आपल्या जवळील रेस्टॉरंट्स शोधण्यासाठी आम्हाला फक्त आपल्या स्थानाची गरज आहे',
     selectAnotherLocation: 'स्थान मॅन्युअली सेट करा',
     setLocation: 'स्थान सेट करा',

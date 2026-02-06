@@ -1,4 +1,4 @@
-export const ur = {
+﻿export const ur = {
     title0: 'منتخب زبان',
     subtitle0: 'انگریزی',
     description0: 'اپنی پسند کی کسی بھی زبان کو منتخب کریں تاکہ ایپ کی مواد کو آپ کی مطلوبہ زبان میں تبدیل کیا جا سکے۔',
@@ -265,7 +265,7 @@ export const ur = {
     currentLocation: 'موجودہ لوکیشن',
     useCurrentLocation: 'موجودہ لوکیشن استعمال کریں',
     locationPermissionMessage: 'اس پیغام پر کلک کریں تاکہ سیٹنگز کھولی جا سکے، پھر ایپ کو اجازتوں سے لوکیشن استعمال کرنے کی اجازت دیں۔',
-    enategaUseYourLocationMessage: 'آپ کے قریب کے ریسٹورنٹس تلاش کرنے کے لیے، ہمیں صرف آپ کی لوکیشن کی ضرورت ہے',
+    ZASUseYourLocationMessage: 'آپ کے قریب کے ریسٹورنٹس تلاش کرنے کے لیے، ہمیں صرف آپ کی لوکیشن کی ضرورت ہے',
     selectAnotherLocation: 'لوکیشن کو دستی طور پر سیٹ کریں',
     setLocation: 'لوکیشن سیٹ کریں',
     cartIsEmpty: 'ٹوکری خالی ہے',

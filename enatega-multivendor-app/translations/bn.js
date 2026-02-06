@@ -1,4 +1,4 @@
-export const bn = {
+﻿export const bn = {
   title0: 'নির্বাচিত ভাষা',
   subtitle0: 'বাংলা',
   description0: 'আপনার পছন্দের ভাষা নির্বাচন করুন এবং অ্যাপের কন্টেন্ট আপনার প্রয়োজনীয় ভাষায় পরিবর্তন করুন।',
@@ -265,7 +265,7 @@ export const bn = {
   currentLocation: 'বর্তমান অবস্থান',
   useCurrentLocation: 'আমার বর্তমান অবস্থান ব্যবহার করুন',
   locationPermissionMessage: 'সেটিংস খুলতে এই বার্তাটি ট্যাপ করুন তারপর অ্যাপকে অনুমতি থেকে অবস্থান ব্যবহার করতে দিন।',
-  enategaUseYourLocationMessage: 'আপনার কাছাকাছি রেস্তোরাঁ খুঁজে পেতে, আমাদের শুধু আপনার অবস্থান প্রয়োজন',
+  ZASUseYourLocationMessage: 'আপনার কাছাকাছি রেস্তোরাঁ খুঁজে পেতে, আমাদের শুধু আপনার অবস্থান প্রয়োজন',
   selectAnotherLocation: 'অবস্থান ম্যানুয়ালি সেট করুন',
   setLocation: 'অবস্থান সেট করুন',
   cartIsEmpty: 'কার্ট খালি',

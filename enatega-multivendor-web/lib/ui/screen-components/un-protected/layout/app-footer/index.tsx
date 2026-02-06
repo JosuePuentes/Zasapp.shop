@@ -14,8 +14,8 @@ const AppFooter = () => {
     pathname?.endsWith("/discovery") ||
     pathname?.endsWith("/store");
 
-  const partnerWithEnatega = {
-    title: t("Footer.partnerWithEnatega"),
+  const partnerWithZas = {
+    title: t("Footer.partnerWithZas"),
     links: [
       { label: t("Footer.home"), link: "/", internal: true },
       { label: t("Footer.forRiders"), link: "/rider", internal: true },
@@ -27,13 +27,13 @@ const AppFooter = () => {
     title: t("Footer.products"),
     links: [
       {
-        label: t("Footer.enategaRider"),
-        link: "https://play.google.com/store/apps/details?id=com.enatega.multirider&hl=en",
+        label: t("Footer.zasRider"),
+        link: "https://play.google.com/store/apps/details?id=com.zas.rider&hl=en",
         internal: false,
       },
       {
-        label: t("Footer.enategaRestaurant"),
-        link: "https://play.google.com/store/apps/details?id=multivendor.enatega.restaurant&hl=en",
+        label: t("Footer.zasRestaurant"),
+        link: "https://play.google.com/store/apps/details?id=zas.store&hl=en",
         internal: false,
       },
     ],
@@ -61,12 +61,12 @@ const AppFooter = () => {
       },
       {
         label: t("Footer.facebook"),
-        link: "https://www.facebook.com/enatega/",
+        link: "https://www.facebook.com/zasapp/",
         internal: false,
       },
       {
         label: t("Footer.linkedIn"),
-        link: "https://www.linkedin.com/company/enatega/?originalSubdomain=pk",
+        link: "https://www.linkedin.com/company/zasapp/?originalSubdomain=pk",
         internal: false,
       },
     ],
@@ -83,7 +83,7 @@ const AppFooter = () => {
             <AppLinks />
           </div>
           <div className="p-2">
-            <FooterLinks section={partnerWithEnatega} />
+            <FooterLinks section={partnerWithZas} />
           </div>
           <div className="p-2">
             <FooterLinks section={products} />

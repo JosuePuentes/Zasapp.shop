@@ -1,4 +1,4 @@
-export const ar = {
+﻿export const ar = {
   title0: 'اللغة المختارة',
   subtitle0: 'الإنجليزية',
   description0: 'اختر أي لغة تفضلها لتغيير محتوى التطبيق إلى اللغة المطلوبة.',
@@ -277,7 +277,7 @@ secureAccountWithPhone: 'سنستخدم رقمك فقط إذا كنا بحاجة
   useCurrentLocation: 'استخدم الموقع الحالي',
   locationPermissionMessage:
     'اضغط على هذه الرسالة لفتح الإعدادات ثم اسمح للتطبيق باستخدام الموقع من الصلاحيات.',
-  enategaUseYourLocationMessage:
+  ZASUseYourLocationMessage:
     'تستخدم إناتيغا موقعك لعرض المطاعم القريبة منك!',
   selectAnotherLocation: 'حدد موقعًا آخر',
   setLocation: 'تعيين الموقع',

@@ -14,7 +14,7 @@ import CustomerApp from "@/public/assets/images/png/CustomerApp.png"
 import { useTranslations } from "next-intl";
 
 
-const EnategaInfo: React.FC = () => {
+const ZasInfo: React.FC = () => {
   const t = useTranslations();
   return (
     <div className="mt-[80px] mb-[80px]">
@@ -45,12 +45,12 @@ const EnategaInfo: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-[30px] mb-[30px]">
-        <HomeCard image={CustomerApp} heading={t('Apps.heading1')} subText={t('Apps.subHeading1')} link={"https://play.google.com/store/apps/details?id=com.enatega.multivendor&hl=en"}/>
-        <HomeCard image={RestaurantApp} heading={t('Apps.heading2')} subText={t('Apps.subHeading2')} link={"https://play.google.com/store/apps/details?id=multivendor.enatega.restaurant&hl=en"} />
-        <HomeCard image={RiderApp} heading={t('Apps.heading3')} subText={t('Apps.subHeading3')} link={"https://play.google.com/store/apps/details?id=com.enatega.multirider&hl=en"}/>
+        <HomeCard image={CustomerApp} heading={t('Apps.heading1')} subText={t('Apps.subHeading1')} link={"https://play.google.com/store/apps/details?id=com.zas.app&hl=en"}/>
+        <HomeCard image={RestaurantApp} heading={t('Apps.heading2')} subText={t('Apps.subHeading2')} link={"https://play.google.com/store/apps/details?id=zas.store&hl=en"} />
+        <HomeCard image={RiderApp} heading={t('Apps.heading3')} subText={t('Apps.subHeading3')} link={"https://play.google.com/store/apps/details?id=com.zas.rider&hl=en"}/>
       </div>
     </div>
   );
 };
 
-export default EnategaInfo;
+export default ZasInfo;

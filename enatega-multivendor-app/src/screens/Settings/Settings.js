@@ -194,7 +194,7 @@ function Settings(props) {
   }
 
   async function selectLanguage() {
-    const lang = await AsyncStorage.getItem('enatega-language')
+    const lang = await AsyncStorage.getItem('ZAS-language')
     if (lang) {
       const defLang = languageTypes.findIndex((el) => el.code === lang)
       const langName = languageTypes[defLang].value
@@ -209,11 +209,11 @@ function Settings(props) {
       setLoadingLang(true)
       const languageInd = activeRadio
       await AsyncStorage.setItem(
-        'enatega-language',
+        'ZAS-language',
         languageTypes[languageInd].code
       )
 
-      var lang = await AsyncStorage.getItem('enatega-language')
+      var lang = await AsyncStorage.getItem('ZAS-language')
       if (lang) {
         const defLang = languageTypes.findIndex((el) => el.code === lang)
         const langName = languageTypes[defLang].value

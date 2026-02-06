@@ -1,4 +1,4 @@
-export const km = {
+﻿export const km = {
   title0: 'ភាសាដែលបានជ្រើសរើស',
   subtitle0: 'អង់គ្លេស',
   description0: 'ជ្រើសប្រភេទភាសា​បើអ្នកចង់ផ្លាស់ប្តូរ​មាតិការ​នៃកម្ពស់​បើចង់',
@@ -277,7 +277,7 @@ secureAccountWithPhone: 'យើងនឹងប្រើលេខរៀងគ្�
   useCurrentLocation: 'ប្រើទីតាំងបច្ចុប្បន្ន',
   locationPermissionMessage:
     'ចុចលើសារនេះដើម្បីបើកការកំណត់ប្រើទីតាំងរបស់អ្នក បន្ទាប់ពីនោះអនុញ្ញាតឱ្យកម្មវិធីប្រើទីតាំង។',
-  enategaUseYourLocationMessage:
+  ZASUseYourLocationMessage:
     'Yalla ប្រើទីតាំងរបស់អ្នកដើម្បីបង្ហាញរបាយទីតាំងដែលនៅជិតអ្នក!',
   selectAnotherLocation: 'ជ្រើសរើសទីតាំងផ្សេងៗ',
   setLocation: 'កំណត់ទីតាំង',

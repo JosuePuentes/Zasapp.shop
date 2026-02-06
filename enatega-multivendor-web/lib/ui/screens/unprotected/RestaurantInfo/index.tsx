@@ -24,7 +24,7 @@ const RestInfo = () => {
 
   const cards = [
     {
-      heading: t("grow_with_Enatega"),
+      heading: t("grow_with_Zas"),
       text: t("access_active_customer_base"),
       image: growth,
       color: "#f7fbfe"
@@ -45,9 +45,9 @@ const RestInfo = () => {
 
   const sideCards = [
     {
-      image: enategaApp,
-      heading: t("how_Enatega_works"),
-      subHeading: t("how_Enatega_works_desc"),
+      image: zasApp,
+      heading: t("how_Zas_works"),
+      subHeading: t("how_Zas_works_desc"),
       right: false
     },
     {
@@ -61,12 +61,12 @@ const RestInfo = () => {
   return (
     <div className='w-screen h-auto'>
       <Heading
-        heading={t("reach_more_customers_and_grow_your_business_with_Enatega")}
-        subHeading={t("partner_with_Enatega_to_create_more_sales")}
+        heading={t("reach_more_customers_and_grow_your_business_with_Zas")}
+        subHeading={t("partner_with_Zas_to_create_more_sales")}
       />
       <StartingImage image={restaurantBanner} />
       <WhyChoose
-        heading={t("why_deliver_with_Enatega")}
+        heading={t("why_deliver_with_Zas")}
         subHeading={t("rider_partner_earn_money_flexible_schedule")}
       />
       <WhyCardsList cards={cards} />

@@ -87,7 +87,7 @@ i18next
 // Async function to detect and set language
 const detectAndSetLanguage = async () => {
   try {
-    const storedLanguage = await AsyncStorage.getItem('enatega-language');
+    const storedLanguage = await AsyncStorage.getItem('ZAS-language');
     const systemLanguage = Localization?.locale?.split('-')[0];
     const availableLanguages = Object.keys(languageResources);
 
@@ -102,8 +102,8 @@ const detectAndSetLanguage = async () => {
     await i18next.changeLanguage(languageToUse);
 
     // Optionally clear stored language keys if you want fresh detection next time
-    await AsyncStorage.removeItem('enatega-language');
-    await AsyncStorage.removeItem('enatega-language-name');
+    await AsyncStorage.removeItem('ZAS-language');
+    await AsyncStorage.removeItem('ZAS-language-name');
   } catch (error) {
     console.error('Error detecting or setting language:', error);
   }

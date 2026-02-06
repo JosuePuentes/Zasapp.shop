@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Enatega Multivendor Rider",
-    "description": "Enatega is a starter kit food ordering app built in React Native using Expo for IOS and Android. It's made keeping good aesthetics in mind as well keeping the best coding practices in mind. Its fully customisable to easily help you in your next food delivery project. https://market.nativebase.io/view/react-native-food-delivery-backend-app",
+    "name": "Zas Rider",
+    "description": "Zas rider app built in React Native using Expo for IOS and Android. It's made keeping good aesthetics in mind as well keeping the best coding practices in mind. Its fully customisable to easily help you in your next food delivery project. https://market.nativebase.io/view/react-native-food-delivery-backend-app",
     "version": "1.1.67",
     "slug": "food-delivery-rider-multivendor",
     "orientation": "portrait",
@@ -23,7 +23,7 @@
         "@sentry/react-native/expo",
         {
           "organization": "ninjas-code",
-          "project": "enatega-rider-app",
+          "project": "zas-rider-app",
           "url": "https://sentry.io/"
         }
       ],
@@ -48,7 +48,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.enatega.multirider",
+      "bundleIdentifier": "com.zas.rider",
       "config": {
         "googleMapsApiKey": "AIzaSyCcm7_Wd7uvmC9YnYLu2JHGWPt6z1MaL1E"
       },
@@ -75,7 +75,7 @@
           "apiKey": "AIzaSyCcm7_Wd7uvmC9YnYLu2JHGWPt6z1MaL1E"
         }
       },
-      "package": "com.enatega.multirider",
+      "package": "com.zas.rider",
       "icon": "./lib/assets/images/appIcon.png",
       "adaptiveIcon": {
         "foregroundImage": "./lib/assets/images/appIcon.png",

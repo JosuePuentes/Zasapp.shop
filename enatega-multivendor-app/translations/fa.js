@@ -1,4 +1,4 @@
-export const fa = {
+﻿export const fa = {
     title0: 'زبان انتخاب شده',
     subtitle0: 'انگلیسی',
     description0: 'هر زبانی که می‌خواهید را انتخاب کنید تا محتوای برنامه به زبان مورد نظر شما تغییر کند.',
@@ -265,7 +265,7 @@ export const fa = {
     currentLocation: 'مکان فعلی',
     useCurrentLocation: 'استفاده از مکان فعلی',
     locationPermissionMessage: 'برای باز کردن تنظیمات و اجازه دسترسی به مکان از طریق اجازه ها، روی این پیام کلیک کنید.',
-    enategaUseYourLocationMessage: 'برای یافتن رستوران های نزدیک به شما، فقط نیاز به مکان شما داریم',
+    ZASUseYourLocationMessage: 'برای یافتن رستوران های نزدیک به شما، فقط نیاز به مکان شما داریم',
     selectAnotherLocation: 'تنظیم دستی مکان',
     setLocation: 'تنظیم مکان',
     cartIsEmpty: 'سبد خرید خالی است',

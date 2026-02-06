@@ -1,4 +1,4 @@
-export const jp = {
+﻿export const jp = {
     title0: '選択した言語',
     subtitle0: '日本語',
     description0: '好きな言語を選択して、アプリの内容を必要な言語に変更します。',
@@ -265,7 +265,7 @@ export const jp = {
     currentLocation: '現在地',
     useCurrentLocation: '現在地を使用',
     locationPermissionMessage: '設定を開いて、アプリが場所を使用することを許可するには、このメッセージをタップしてください。',
-    enategaUseYourLocationMessage: '近くのレストランを見つけるには、場所が必要です',
+    ZASUseYourLocationMessage: '近くのレストランを見つけるには、場所が必要です',
     selectAnotherLocation: '場所を手動で設定',
     setLocation: '場所を設定',
     cartIsEmpty: 'カートは空です',

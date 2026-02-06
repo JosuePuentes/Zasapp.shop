@@ -77,8 +77,8 @@ const ForceUpdate = () => {
     try {
       let storeUrl =
         Platform.OS === 'ios'
-          ? 'https://apps.apple.com/pk/app/enatega-multivendor/id1526488093'
-          : 'https://play.google.com/store/apps/details?id=com.enatega.multivendor&pli=1'
+          ? 'https://apps.apple.com/pk/app/ZAS-multivendor/id1526488093'
+          : 'https://play.google.com/store/apps/details?id=com.ZAS.multivendor&pli=1'
 
       await Linking.openURL(storeUrl)
     } catch (err) {

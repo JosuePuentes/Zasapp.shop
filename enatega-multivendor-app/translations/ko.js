@@ -1,4 +1,4 @@
-export const ko = {
+﻿export const ko = {
     title0: '선택한 언어',
     subtitle0: '영어',
     description0: '원하는 언어로 앱 내용을 변경하려면 언어를 선택하세요.',
@@ -265,7 +265,7 @@ export const ko = {
     currentLocation: '현재 위치',
     useCurrentLocation: '현재 위치 사용',
     locationPermissionMessage: '설정을 열려면 이 메시지를 탭한 다음 앱이 위치를 사용하도록 허용합니다.',
-    enategaUseYourLocationMessage: '가까운 레스토랑을 찾으려면 위치가 필요합니다',
+    ZASUseYourLocationMessage: '가까운 레스토랑을 찾으려면 위치가 필요합니다',
     selectAnotherLocation: '위치를 수동으로 설정',
     setLocation: '위치 설정',
     cartIsEmpty: '장바구니가 비어 있습니다',

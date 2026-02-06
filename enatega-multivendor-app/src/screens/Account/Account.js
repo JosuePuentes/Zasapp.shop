@@ -185,7 +185,7 @@ function Account(props) {
   }
 
   const fetchSelectedLanguage = async () => {
-    const lang = await AsyncStorage.getItem('enatega-language-name')
+    const lang = await AsyncStorage.getItem('ZAS-language-name')
     const systemLangCode = Localization?.locale?.split('-')[0]
 
     if (lang) {
@@ -521,7 +521,7 @@ function Account(props) {
                     detail={''}
                     status='null'
                     onPress={() => {
-                      Linking.openURL('https://multivendor.enatega.com/terms')
+                      Linking.openURL('https://multivendor.ZAS.com/terms')
                     }}
                   />
                   <View style={styles(currentTheme).line} />
@@ -531,7 +531,7 @@ function Account(props) {
                     detail={''}
                     status='null'
                     onPress={() => {
-                      Linking.openURL('https://multivendor.enatega.com/privacy')
+                      Linking.openURL('https://multivendor.ZAS.com/privacy')
                     }}
                   />
                 </View>
