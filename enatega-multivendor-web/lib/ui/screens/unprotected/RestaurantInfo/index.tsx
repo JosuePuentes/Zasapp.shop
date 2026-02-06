@@ -13,7 +13,7 @@ import StartingImage from '@/lib/ui/useable-components/RiderandRestaurantsInfos/
 
 // images
 import WorldClassCustomers from "@/public/assets/images/png/WorldClassCustomer.webp";
-import enategaApp from "@/public/assets/images/png/enategaApp.png";
+import zasApp from "@/public/assets/images/png/enategaApp.png";
 import growth from "@/public/assets/images/png/Growth.png";
 import getMoreOrders from "@/public/assets/images/png/GetMoreOrders.png";
 import deliverMoreCustomers from "@/public/assets/images/png/deliverToCustomer.png";
