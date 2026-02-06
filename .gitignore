@@ -51,6 +51,9 @@ node_modules/
 .env
 .env.*
 .env*.local
+# Permitir plantilla sin contraseñas (sí subir)
+!.env.example
+!**/.env.example
 
 # Google / Firebase (credenciales, no subir)
 **/google-service-account*.json
