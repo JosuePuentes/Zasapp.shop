@@ -26,7 +26,9 @@ export default function FirebaseForegroundHandler() {
       FIREBASE_APP_ID;
 
     if (!isReady) {
-      console.warn("⚠️ Firebase config not ready yet.");
+      if (process.env.NODE_ENV === "development") {
+        console.warn("⚠️ Firebase config not ready yet.");
+      }
       return;
     }
 
@@ -40,6 +42,7 @@ export default function FirebaseForegroundHandler() {
     };
 
     const { messaging } = setupFirebase(firebaseConfig);
+    if (!messaging) return;
 
     const unsubscribe = onMessage(messaging, (payload) => {
       console.log("📩 Message received:", payload);
