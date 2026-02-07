@@ -7,10 +7,10 @@ import { useTranslations } from 'next-intl';
 const AnimatedText = () => {
   const t = useTranslations();
   const texts = [
-  t('burgers'),
-  t('gifts'),
-  t('desserts'),
-  t('pizza')
+  t('flyingText1'),
+  t('flyingText2'),
+  t('flyingText3'),
+  t('flyingText4')
 ];
 
 const containerVariants = {

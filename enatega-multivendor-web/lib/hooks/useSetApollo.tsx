@@ -49,14 +49,17 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
     },
   });
 
+  const baseUrl = (SERVER_URL || "").replace(/\/?$/, "/");
+  const wsBaseUrl = (WS_SERVER_URL || "").replace(/\/?$/, "/");
+
   const httpLink = createHttpLink({
-    uri: `${SERVER_URL}graphql`,
+    uri: `${baseUrl}graphql`,
     // useGETForQueries: true,
   });
 
   // WebSocketLink with error handling
   const wsLink = new WebSocketLink(
-    new SubscriptionClient(`${WS_SERVER_URL}graphql`, {
+    new SubscriptionClient(`${wsBaseUrl}graphql`, {
       reconnect: true,
       timeout: 30000,
       lazy: true,

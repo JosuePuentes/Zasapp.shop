@@ -3,6 +3,10 @@
   "searchCity": "Search for a city...",
   "gifts": "GIFTS.",
   "PIZZA": "PIZZA.",
+  "flyingText1": "PRODUCTS.",
+  "flyingText2": "DELIVERY.",
+  "flyingText3": "STORES.",
+  "flyingText4": "DEALS.",
   "SearchBarPlaceholder": "Search in zas",
   "LoginForSavedAddresses": {
     "loginPrompt": "Login for saved address",
