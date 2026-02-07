@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 const GRAPHQL_BACKEND = (process.env.NEXT_PUBLIC_SERVER_URL || "").replace(
   /\/?$/,
   "/"

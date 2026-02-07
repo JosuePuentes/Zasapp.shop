@@ -13,7 +13,12 @@ function getSafeLocale(locale: string): string {
 }
 
 export default getRequestConfig(async () => {
-  const rawLocale = await getUserLocale();
+  let rawLocale: string | undefined;
+  try {
+    rawLocale = await getUserLocale();
+  } catch {
+    rawLocale = "en";
+  }
   const locale = getSafeLocale(rawLocale || "en");
 
   let messages;

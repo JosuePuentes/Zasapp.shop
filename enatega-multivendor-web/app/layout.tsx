@@ -16,17 +16,24 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const locale = await getLocale();
+  let locale = "en";
+  let messages: Record<string, unknown> = {};
+  try {
+    locale = await getLocale();
+    messages = (await getMessages({ locale })) as Record<string, unknown>;
+  } catch (e) {
+    try {
+      messages = (await import("@/locales/en.json")).default as Record<string, unknown>;
+    } catch {
+      // fallback vacío para no romper la página
+    }
+  }
   const rtlLocales = ["ar", "hr", "fa", "ur"];
   const baseLocale = locale.split("-")[0];
   const dir =
     rtlLocales.includes(locale) || rtlLocales.includes(baseLocale)
       ? "rtl"
       : "ltr";
-  //Providing all messages to the client
-  //side is the easiest way to get started
-
-  const messages = await getMessages({ locale });
 
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning>
