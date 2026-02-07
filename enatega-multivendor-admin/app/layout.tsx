@@ -5,9 +5,9 @@ import { ThemeProvider } from 'next-themes';
 
 // ✅ Add metadata export for favicon
 export const metadata = {
-  title: 'ZAS Admin Dashboard',
+  title: 'Zas! Admin',
   icons: {
-    icon: '/favsicons.png',
+    icon: '/favicon.png',
     // You can add more like:
     // shortcut: "/favicon.png",
     // apple: "/apple-touch-icon.png"

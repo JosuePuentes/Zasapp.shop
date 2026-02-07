@@ -1,7 +1,7 @@
 {
-  "name": "Zas",
-  "id":"/",
-  "short_name": "Zas",
+  "name": "Zas!",
+  "id": "/",
+  "short_name": "Zas!",
   "description": "A Progressive Web App built with Next.js",
   "start_url": "/",
   "background_color": "#000",
@@ -11,21 +11,9 @@
   "categories": ["shopping", "food", "delivery"],
   "dir": "ltr",
   "lang": "en",
-  "icons":[
-      {
-          "src": "/512.png",
-          "sizes": "512x512",
-          "type": "image/png"
-        },
-        {
-          "src": "/192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        },
-        {
-          "src": "/144.png",
-          "sizes": "144x144",
-          "type": "image/png"
-        }
+  "icons": [
+    {"src": "/512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "/192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "/144.png", "sizes": "144x144", "type": "image/png"}
   ]
 }

@@ -52,8 +52,13 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
   const baseUrl = (SERVER_URL || "").replace(/\/?$/, "/");
   const wsBaseUrl = (WS_SERVER_URL || "").replace(/\/?$/, "/");
 
+  // En el cliente usamos el proxy /api/graphql para evitar CORS con el backend en Render.
+  // En SSR (servidor) las peticiones van directo al backend (sin CORS).
+  const isClient = typeof window !== "undefined";
+  const httpUri = isClient ? "/api/graphql" : `${baseUrl}graphql`;
+
   const httpLink = createHttpLink({
-    uri: `${baseUrl}graphql`,
+    uri: httpUri,
     // useGETForQueries: true,
   });
 
