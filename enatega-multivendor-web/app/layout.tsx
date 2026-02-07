@@ -2,7 +2,7 @@ import { DirectionProvider } from "@/lib/context/direction/DirectionContext";
 import { ThemeProvider } from "@/lib/providers/ThemeProvider";
 import { DirectionHandler } from "@/lib/ui/layouts/global/rtl/DirectionHandler";
 // import InstallPWA from "@/lib/ui/pwa/InstallPWA";
-import { NextIntlClientProvider } from "next-intl";
+import { AbstractIntlMessages, NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import Script from "next/script";
 
@@ -17,13 +17,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   let locale = "en";
-  let messages: Record<string, unknown> = {};
+  let messages: AbstractIntlMessages = {};
   try {
     locale = await getLocale();
-    messages = (await getMessages({ locale })) as Record<string, unknown>;
-  } catch (e) {
+    const m = await getMessages({ locale });
+    messages = (m ?? {}) as AbstractIntlMessages;
+  } catch {
     try {
-      messages = (await import("@/locales/en.json")).default as Record<string, unknown>;
+      messages = (await import("@/locales/en.json")).default as AbstractIntlMessages;
     } catch {
       // fallback vacío para no romper la página
     }
