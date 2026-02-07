@@ -18,8 +18,17 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin();
 
+// Proxy /api/graphql al backend (funciona aunque la Route API no se despliegue)
+const backendUrl = process.env.NEXT_PUBLIC_SERVER_URL || "https://zasapp-shop.onrender.com";
+const graphqlDestination = `${backendUrl.replace(/\/?$/, "")}/graphql`;
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async rewrites() {
+    return [
+      { source: "/api/graphql", destination: graphqlDestination },
+    ];
+  },
   webpack: (config) => {
     config.module.rules.push({
       test: /\.(woff|woff2|eot|ttf|otf)$/i,

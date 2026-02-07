@@ -25,9 +25,9 @@ export const ConfigurationProvider = ({
   const { loading, data, error } = useQuery(GET_CONFIG);
 
   const configuration =
-    loading || error || !data.configuration ?
-      { currency: "", currencySymbol: "", deliveryRate: 0, costType: "perKM" }
-    : data.configuration;
+    loading || error || !data?.configuration
+      ? { currency: "", currencySymbol: "", deliveryRate: 0, costType: "perKM" }
+      : data.configuration;
 
   
   const GOOGLE_CLIENT_ID = configuration.webClientID;
