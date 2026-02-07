@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable max-lines */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable max-lines */
 
 // Core
 import { Sidebar } from "primereact/sidebar";

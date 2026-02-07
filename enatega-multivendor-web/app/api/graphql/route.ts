@@ -6,7 +6,7 @@ const GRAPHQL_BACKEND = (process.env.NEXT_PUBLIC_SERVER_URL || "").replace(
 );
 const BACKEND_GRAPHQL_URL = `${GRAPHQL_BACKEND}graphql`;
 
-function getForwardHeaders(req: NextRequest): HeadersInit {
+function getForwardHeaders(req: NextRequest): Record<string, string> {
   const headers: Record<string, string> = {
     "content-type": req.headers.get("content-type") || "application/json",
   };
