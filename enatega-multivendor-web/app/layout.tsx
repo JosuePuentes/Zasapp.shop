@@ -11,6 +11,9 @@ export const metadata = {
   manifest: "/manifest.json",
 };
 
+// Evita pre-render estático: muchas rutas usan document/localStorage y fallan en el servidor
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: {
