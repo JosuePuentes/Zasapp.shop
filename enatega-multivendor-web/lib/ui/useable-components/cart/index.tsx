@@ -76,7 +76,7 @@ export default function Cart({ onClose }: CartProps) {
   });
   const storeMap = React.useMemo(() => {
     const m: Record<string, { publicName: string; brandColor: string }> = {};
-    (storesData?.storesByIds || []).forEach((s: { _id: string; publicName?: string; brandColor?: string }) => {
+    (storesData?.storesByIds || []).forEach((s: { _id: string; publicName?: string; brandColor?: string; name?: string }) => {
       m[s._id] = { publicName: s.publicName || s.name || "Tienda", brandColor: s.brandColor || "#22c55e" };
     });
     return m;
