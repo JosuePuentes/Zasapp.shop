@@ -14,7 +14,7 @@ export default function ProductsMarketplaceScreen() {
   const { CURRENCY_SYMBOL } = useConfig();
   const { cartStoreIds } = useUser();
   const { userAddress } = useUserAddress();
-  const [department, _setDepartment] = useState<string>("");
+  const department = "";
   const [sameStoreFilter, setSameStoreFilter] = useState<string | null>(null);
 
   const clientLat = userAddress?.location?.coordinates?.[1];
