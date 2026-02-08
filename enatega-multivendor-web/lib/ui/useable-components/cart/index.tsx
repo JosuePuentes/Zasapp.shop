@@ -243,7 +243,8 @@ export default function Cart({ onClose }: CartProps) {
           {/* Cart Items grouped by store with color blocks */}
           <div className="p-4 space-y-4">
             {(cartStoreIds.length ? cartStoreIds : [restaurantId].filter(Boolean)).map((storeId, groupIndex) => {
-              const storeInfo = storeMap[storeId];
+              const id = storeId ?? "";
+              const storeInfo = storeMap[id];
               const storeLabel = storeInfo?.publicName || (cartStoreIds.length > 1
                 ? `Tienda ${String.fromCharCode(65 + groupIndex)}`
                 : getshopTypeTranslated());
@@ -254,7 +255,7 @@ export default function Cart({ onClose }: CartProps) {
               const blockColor = storeInfo?.brandColor || "#22c55e";
               return (
                 <div
-                  key={storeId || groupIndex}
+                  key={id || `group-${groupIndex}`}
                   className="space-y-3 rounded-lg overflow-hidden border-l-4"
                   style={{ borderLeftColor: blockColor }}
                 >
