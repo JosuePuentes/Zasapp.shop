@@ -1,0 +1,13 @@
+# Render Blueprint: backend Zasapp (GraphQL API)
+# Conecta este repo en Render y usa "Blueprint" o configura el servicio con Root Directory = server
+services:
+  - type: web
+    name: zasapp-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "18"

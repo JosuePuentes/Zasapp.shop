@@ -21,6 +21,14 @@ Para que `searchProducts` devuelva resultados, crea al menos una **Store** con `
 La URI en `.env` apunta a tu cluster en Atlas: **Zasapp**.  
 Usuario: `josuepuentes1234_db_user`.
 
+## Si el deploy no se hace o falla en Render
+
+El repo es un **monorepo** (varias carpetas: `server`, `enatega-multivendor-admin`, etc.). Render debe usar **solo la carpeta `server`** para construir y arrancar el backend.
+
+1. **Root Directory:** En el servicio de Render → **Settings** → **Build & Deploy** → **Root Directory** debe estar en **`server`**. Si está vacío o en otra ruta, el build falla (no hay `package.json` en la raíz).
+2. **Blueprint:** En la raíz del repo hay un **`render.yaml`** que define el servicio con `rootDir: server`. Si creas el servicio desde cero con "Blueprint" y este repo, Render usará esa configuración.
+3. **Logs:** En Render → tu servicio → **Logs** revisa si el error es de build (`npm install`) o de arranque (p. ej. `MONGODB_URI` faltante o crash al cargar módulos).
+
 ## Conectar el backend (Render) a la base de datos
 
 El backend que corre en **Render** (`zasapp-shop.onrender.com`) debe tener las mismas variables de entorno que usas en `server/.env` para conectarse a MongoDB y funcionar bien.
