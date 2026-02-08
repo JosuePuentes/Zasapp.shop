@@ -94,8 +94,10 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
   });
 
   const request = async (operation: Operation): Promise<void> => {
-    const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const userId =
+      typeof window !== "undefined" ? localStorage.getItem("userId") : null;
     operation.setContext({
       headers: {
         authorization: (token ?? "") ? `Bearer ${token ?? ""}` : "",

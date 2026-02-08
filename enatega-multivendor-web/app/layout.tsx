@@ -42,6 +42,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" type="image/png" href="/favicon.png" />
         {/* 🔥 Inline theme script to prevent flash of wrong theme */}
         <script
@@ -88,7 +89,7 @@ export default async function RootLayout({
         />
         {/* Add more media queries for other device sizes if needed */}
       </head>
-      <body className={dir === "rtl" ? "rtl" : ""}>
+      <body className={`flex flex-col flex-wrap ${dir === "rtl" ? "rtl" : ""}`}>
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
             <DirectionProvider dir={dir}>
