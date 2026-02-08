@@ -7,3 +7,4 @@ export * from "./orders";
 export * from "./profile";
 export * from "./zone";
 export * from "./products";
+export * from "./driver";

@@ -1,6 +1,22 @@
 const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
+  type DriverDocuments {
+    license: String
+    medicalCert: String
+    circulationCard: String
+    plate: String
+  }
+
+  type DriverProfile {
+    vehicleBrand: String
+    vehicleModel: String
+    vehicleYear: Int
+    vehicleType: String
+    documents: DriverDocuments
+    verificationStatus: String
+  }
+
   type User {
     _id: ID!
     userId: ID!
@@ -13,6 +29,7 @@ const typeDefs = gql`
     emailIsVerified: Boolean
     phoneIsVerified: Boolean
     isActive: Boolean
+    driverProfile: DriverProfile
   }
 
   type AuthPayload {
@@ -48,6 +65,17 @@ const typeDefs = gql`
     status: String!
     isActive: Boolean!
     department: String
+    lat: Float
+    lng: Float
+    publicName: String
+    brandColor: String
+  }
+
+  type DeliveryFeeResult {
+    deliveryFee: Float!
+    isFlashRate: Boolean!
+    totalDistanceKm: Float!
+    message: String
   }
 
   type Product {
@@ -70,6 +98,61 @@ const typeDefs = gql`
     costType: String
   }
 
+  type RouteStopItem {
+    productName: String
+    productId: ID
+    quantity: Int
+  }
+
+  type RouteStop {
+    sequence: Int!
+    storeId: ID
+    storeName: String
+    lat: Float!
+    lng: Float!
+    items: [RouteStopItem!]
+    completedAt: String
+  }
+
+  type Route {
+    _id: ID!
+    orderId: ID
+    driver: ID
+    stops: [RouteStop!]!
+    deliveryLat: Float!
+    deliveryLng: Float!
+    deliveryAddress: String
+    status: String!
+    totalDeliveryFee: Float
+    driverEarnings: Float
+    platformEarnings: Float
+    estimatedDistanceKm: Float
+    estimatedMinutes: Int
+    createdAt: String
+  }
+
+  type WalletTransaction {
+    orderId: ID!
+    totalDeliveryFee: Float!
+    driverAmount: Float!
+    platformAmount: Float!
+    createdAt: String
+  }
+
+  type DeliveryWallet {
+    driver: ID!
+    balance: Float!
+    platformShareTotal: Float!
+    transactions: [WalletTransaction!]
+  }
+
+  type DeliveryTabulator {
+    pricePerKm: Float!
+    minFee: Float!
+    driverPercent: Int!
+    platformPercent: Int!
+  }
+
   input CreateUserInput {
     name: String!
     lastName: String
@@ -81,6 +164,17 @@ const typeDefs = gql`
     appleId: String
     emailIsVerified: Boolean
     isPhoneExists: Boolean
+  }
+
+  input UpdateDriverProfileInput {
+    vehicleBrand: String
+    vehicleModel: String
+    vehicleYear: Int
+    vehicleType: String
+    documentLicense: String
+    documentMedicalCert: String
+    documentCirculationCard: String
+    documentPlate: String
   }
 
   type UserAddress {
@@ -110,10 +204,18 @@ const typeDefs = gql`
   type Query {
     me: User
     profile: Profile
-    searchProducts(department: String): [Product!]!
+    searchProducts(department: String, clientLat: Float, clientLng: Float, firstStoreId: String): [Product!]!
+    searchProductsByStore(storeId: ID!): [Product!]!
+    storesByIds(storeIds: [ID!]!): [Store!]!
+    calculateDeliveryFee(storeIds: [ID!]!, clientLat: Float!, clientLng: Float!): DeliveryFeeResult!
     configuration: Configuration
     emailExist(email: String!): User
     phoneExist(phone: String!): User
+    deliveryTabulator: DeliveryTabulator!
+    driverWallet: DeliveryWallet
+    driverRoutes: [Route!]!
+    driverAvailableRoutes: [Route!]!
+    route(routeId: ID!): Route
   }
 
   type Mutation {
@@ -126,6 +228,10 @@ const typeDefs = gql`
       notificationToken: String
       isActive: Boolean
     ): AuthPayload!
+    updateDriverProfile(input: UpdateDriverProfileInput!): User!
+    takeRoute(routeId: ID!): Route!
+    updateRouteStatus(routeId: ID!, status: String!): Route!
+    reportDriverLocation(routeId: ID!, lat: Float!, lng: Float!): Boolean
   }
 `;
 

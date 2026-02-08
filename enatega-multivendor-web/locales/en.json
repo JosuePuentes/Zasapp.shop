@@ -114,6 +114,9 @@
     "cuisineSectionTitle": "Browse categories",
     "mainSectionTitle": "All stores"
   },
+  "Marketplace": {
+    "products": "Products"
+  },
   "StoresPage": {
     "headingTitle": "Stores and groceries near you",
     "cuisineSectionTitle": "Browse categories",

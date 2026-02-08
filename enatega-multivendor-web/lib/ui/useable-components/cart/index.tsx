@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 import { useQuery, useApolloClient } from "@apollo/client";
 import { RELATED_ITEMS, FOOD } from "@/lib/api/graphql";
+import { STORES_BY_IDS } from "@/lib/api/graphql/queries/products";
 
 // Hooks
 import useUser from "@/lib/hooks/useUser";
@@ -30,6 +31,8 @@ export default function Cart({ onClose }: CartProps) {
     updateItemQuantity,
     calculateSubtotal,
     restaurant: restaurantId,
+    cartStoreIds,
+    hasMultipleStores,
   } = useUser();
 
   const { CURRENCY_SYMBOL } = useConfig();
@@ -65,6 +68,21 @@ export default function Cart({ onClose }: CartProps) {
     },
     skip: !firstCartItemId || !restaurantId,
   });
+
+  const storeIdsToFetch = cartStoreIds?.length ? cartStoreIds : (restaurantId ? [restaurantId] : []);
+  const { data: storesData } = useQuery(STORES_BY_IDS, {
+    variables: { storeIds: storeIdsToFetch },
+    skip: storeIdsToFetch.length === 0,
+  });
+  const storeMap = React.useMemo(() => {
+    const m: Record<string, { publicName: string; brandColor: string }> = {};
+    (storesData?.storesByIds || []).forEach((s: { _id: string; publicName?: string; brandColor?: string }) => {
+      m[s._id] = { publicName: s.publicName || s.name || "Tienda", brandColor: s.brandColor || "#22c55e" };
+    });
+    return m;
+  }, [storesData]);
+  const hasSingleStore = storeIdsToFetch.length === 1;
+  const firstStoreInfo = storeIdsToFetch.length ? storeMap[storeIdsToFetch[0]] : null;
 
   const handleClearCart = async () => {
     await clearCart();
@@ -198,12 +216,58 @@ export default function Cart({ onClose }: CartProps) {
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto">
-          {/* Cart Items */}
+          {hasSingleStore && firstStoreInfo && (
+            <div
+              className="mx-4 mt-3 p-3 rounded-lg border-2 flex items-center gap-2"
+              style={{
+                borderColor: firstStoreInfo.brandColor,
+                backgroundColor: `${firstStoreInfo.brandColor}15`,
+              }}
+            >
+              <div
+                className="w-3 h-3 rounded-full shrink-0"
+                style={{ backgroundColor: firstStoreInfo.brandColor }}
+              />
+              <p className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                ¡Compra unificada! Tu delivery es {firstStoreInfo.publicName} y solo cuesta $1.50
+              </p>
+            </div>
+          )}
+          {hasMultipleStores && (
+            <div className="mx-4 mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                Comprar en tiendas distintas aumenta el costo de envío.
+              </p>
+            </div>
+          )}
+          {/* Cart Items grouped by store with color blocks */}
           <div className="p-4 space-y-4">
-            {cart.map((item) => (
+            {(cartStoreIds.length ? cartStoreIds : [restaurantId].filter(Boolean)).map((storeId, groupIndex) => {
+              const storeInfo = storeMap[storeId];
+              const storeLabel = storeInfo?.publicName || (cartStoreIds.length > 1
+                ? `Tienda ${String.fromCharCode(65 + groupIndex)}`
+                : getshopTypeTranslated());
+              const itemsInStore = cart.filter(
+                (item) => (item.storeId || restaurantId) === storeId
+              );
+              if (itemsInStore.length === 0) return null;
+              const blockColor = storeInfo?.brandColor || "#22c55e";
+              return (
+                <div
+                  key={storeId || groupIndex}
+                  className="space-y-3 rounded-lg overflow-hidden border-l-4"
+                  style={{ borderLeftColor: blockColor }}
+                >
+                  <h3
+                    className="text-sm font-bold uppercase tracking-wide px-2 py-1 rounded-r"
+                    style={{ color: blockColor, backgroundColor: `${blockColor}20` }}
+                  >
+                    {storeLabel}
+                  </h3>
+                  {itemsInStore.map((item) => (
               <div
                 key={item.key}
-                className="flex sm:flex-row sm:items-center bg-white dark:bg-gray-800 dark:text-white rounded-lg p-3 shadow-sm dark:shadow-gray-700"
+                className="flex sm:flex-row sm:items-center bg-white dark:bg-gray-800 dark:text-white rounded-lg p-3 shadow-sm dark:shadow-gray-700 ml-2"
               >
                 <div className="flex-grow">
                   <div className="flex sm:flex-row flex-col sm:items-center gap-4">
@@ -266,7 +330,10 @@ export default function Cart({ onClose }: CartProps) {
                   </button>
                 </div>
               </div>
-            ))}
+                  ))}
+                </div>
+              );
+            })}
           </div>
 
           {/* Recommended for You Section */}

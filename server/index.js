@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const { ApolloServer } = require("apollo-server-express");
 
 const Product = require("./models/Product");
+const Order = require("./models/Order");
 const typeDefs = require("./graphql/schema");
 const resolvers = require("./graphql/resolvers");
 

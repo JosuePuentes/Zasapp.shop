@@ -78,6 +78,7 @@ import { useTranslations } from "next-intl";
 import { useTheme } from "@/lib/providers/ThemeProvider";
 import { darkMapStyle } from "@/lib/utils/mapStyles/mapStyle";
 import { GET_TIPS } from "@/lib/api/graphql/queries/tipping";
+import { CALCULATE_DELIVERY_FEE } from "@/lib/api/graphql/queries/products";
 
 //Coupon localStorage Keys
 const COUPON_STORAGE_KEY = "applied_coupon";
@@ -95,6 +96,7 @@ export default function OrderCheckoutScreen() {
   const [isPickUp, setIsPickUp] = useState(false);
   const [selectedTip, setSelectedTip] = useState("");
   const [distance, setDistance] = useState("0.0");
+  const [isFlashRate, setIsFlashRate] = useState(false);
   const [shouldLeaveAtDoor, setShouldLeaveAtDoor] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(
     PAYMENT_METHOD_LIST[0].value,
@@ -119,6 +121,7 @@ export default function OrderCheckoutScreen() {
   const {
     cart,
     restaurant: restaurantId,
+    cartStoreIds,
     clearCart,
     profile,
     fetchProfile,
@@ -390,6 +393,37 @@ export default function OrderCheckoutScreen() {
 
   // API
   const { data: tipData } = useQuery(GET_TIPS);
+  const storeIdsForFee =
+    cartStoreIds?.length > 0
+      ? cartStoreIds
+      : restaurantId
+        ? [restaurantId]
+        : [];
+  const clientLat = userAddress?.location?.coordinates?.[1];
+  const clientLng = userAddress?.location?.coordinates?.[0];
+  const { data: deliveryFeeData } = useQuery(CALCULATE_DELIVERY_FEE, {
+    variables: {
+      storeIds: storeIdsForFee,
+      clientLat: clientLat ?? 0,
+      clientLng: clientLng ?? 0,
+    },
+    skip:
+      !storeIdsForFee.length ||
+      clientLat == null ||
+      clientLng == null ||
+      isPickUp,
+  });
+
+  useEffect(() => {
+    if (deliveryFeeData?.calculateDeliveryFee && !isPickUp) {
+      setDeliveryCharges(deliveryFeeData.calculateDeliveryFee.deliveryFee);
+      setDistance(
+        String(deliveryFeeData.calculateDeliveryFee.totalDistanceKm?.toFixed(2) ?? "0")
+      );
+      setIsFlashRate(!!deliveryFeeData.calculateDeliveryFee.isFlashRate);
+    }
+  }, [deliveryFeeData, isPickUp]);
+
   const [placeOrder, { loading: loadingOrderMutation }] = useMutation(
     PLACE_ORDER,
     {
@@ -465,19 +499,17 @@ export default function OrderCheckoutScreen() {
     const latDest = userAddress?.location?.coordinates?.[1] || 0;
     const longDest = userAddress?.location?.coordinates?.[0] || 0;
 
-    console.log("Restaurant:", latOrigin, lonOrigin);
-    console.log("User:", latDest, longDest);
-
     const distance = calculateDistance(latOrigin, lonOrigin, latDest, longDest);
-    console.log("Distance (km):", distance);
-
-    let amount = calculateAmount(
+    const singleStore = storeIdsForFee?.length <= 1;
+    const amount = calculateAmount(
       COST_TYPE as OrderTypes.TCostType,
       DELIVERY_RATE,
       distance,
+      { singleStore },
     );
     setDistance(distance.toFixed(2));
     setDeliveryCharges(amount > 0 ? amount : DELIVERY_RATE);
+    setIsFlashRate(singleStore && distance < 2 && distance >= 0);
   };
 
   // const togglePriceSummary = () => {
@@ -1413,11 +1445,15 @@ export default function OrderCheckoutScreen() {
               {deliveryType === "Delivery" && (
                 <div className="flex justify-between mb-1 text-xs lg:text-[14px]">
                   <span className="font-inter text-gray-900 dark:text-white leading-5">
-                    {t("delivery_with_distance_label")} ({distance} km)
+                    {isFlashRate ? (
+                      <>Tarifa Flash ({distance} km)</>
+                    ) : (
+                      <>{t("delivery_with_distance_label")} ({distance} km)</>
+                    )}
                   </span>
                   <span className="font-inter text-gray-900  dark:text-white leading-5">
                     {CURRENCY_SYMBOL}
-                    {deliveryCharges.toFixed()}
+                    {deliveryCharges.toFixed(2)}
                   </span>
                 </div>
               )}
@@ -1524,14 +1560,16 @@ export default function OrderCheckoutScreen() {
               {deliveryType === "Delivery" && (
                 <div className="flex justify-between mb-1 text-xs lg:text-[12px]">
                   <span className="font-inter text-gray-900 dark:text-white leading-5">
-                    {t("delivery_with_distance_label", {
-                      distance,
-                      unit: t("km_unit"),
-                    })}
+                    {isFlashRate
+                      ? `Tarifa Flash (${distance} km)`
+                      : t("delivery_with_distance_label", {
+                          distance,
+                          unit: t("km_unit"),
+                        })}
                   </span>
                   <span className="font-inter text-gray-900 dark:text-white leading-5">
                     {CURRENCY_SYMBOL}
-                    {deliveryCharges.toFixed()}
+                    {deliveryCharges.toFixed(2)}
                   </span>
                 </div>
               )}

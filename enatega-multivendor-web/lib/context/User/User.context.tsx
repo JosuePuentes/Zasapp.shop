@@ -62,6 +62,8 @@ export interface CartItem {
   variationTitle?: string;
   optionTitles?: string[];
   price?: string | number;
+  /** Store ID for grouping (Tienda A, B) and delivery fee */
+  storeId?: string;
 }
 
 export interface ProfileType {
@@ -154,6 +156,9 @@ export interface UserContextType {
   networkStatusOrders: number;
   cart: CartItem[];
   cartCount: number;
+  /** Unique store IDs in order of first appearance (for Tienda A, B labels) */
+  cartStoreIds: string[];
+  hasMultipleStores: boolean;
   clearCart: () => void;
   updateCart: (cart: CartItem[]) => Promise<void>;
   addQuantity: (key: string, quantity?: number) => Promise<void>;
@@ -583,6 +588,22 @@ export const UserProvider: React.FC<{ children: ReactNode }> = (props) => {
     return cart.map((c) => c.quantity).reduce((a, b) => a + b, 0);
   }, [cart]);
 
+  const cartStoreIds = React.useMemo(() => {
+    const seen = new Set<string>();
+    const ids: string[] = [];
+    cart.forEach((c) => {
+      const sid = c.storeId || (restaurant || "");
+      if (sid && !seen.has(sid)) {
+        seen.add(sid);
+        ids.push(sid);
+      }
+    });
+    if (ids.length === 0 && restaurant) ids.push(restaurant);
+    return ids;
+  }, [cart, restaurant]);
+
+  const hasMultipleStores = cartStoreIds.length > 1;
+
   // Enhanced method that replaces the old addCartItem - uses setCartRestaurant which is defined above
   const addItem = useCallback(
     async (
@@ -599,42 +620,28 @@ export const UserProvider: React.FC<{ children: ReactNode }> = (props) => {
       }> = [],
       specialInstructions: string = ""
     ) => {
-      // Check if we need to clear the cart (different restaurant)
-      const needsClear = Boolean(restaurantId && restaurant !== restaurantId);
-
-      // Create new cart item
       const newItem: CartItem = {
         image,
         key: v4(),
         _id: foodId,
         quantity,
-        variation: {
-          _id: variationId,
-        },
+        variation: { _id: variationId },
         addons,
         specialInstructions,
+        storeId: restaurantId,
       };
 
-      // Set restaurant first
-      await setCartRestaurant(restaurantId);
+      setCartRestaurant(restaurantId);
 
-      // Update cart
       setCart((prevCart) => {
-        // Use empty array if needsClear is true, otherwise use current cart
-        const cartItems = needsClear ? [] : [...prevCart];
-
-        // Add the new item
-        const updatedCart = [...cartItems, newItem];
-
-        // Save to localStorage
+        const updatedCart = [...prevCart, newItem];
         if (typeof window !== "undefined") {
           localStorage.setItem("cartItems", JSON.stringify(updatedCart));
         }
-
         return updatedCart;
       });
     },
-    [restaurant, setCartRestaurant]
+    [setCartRestaurant]
   );
 
   const updateCart = useCallback(
@@ -770,6 +777,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = (props) => {
         networkStatusOrders,
         cart,
         cartCount: numberOfCartItems(),
+        cartStoreIds,
+        hasMultipleStores,
         clearCart,
         updateCart,
         addQuantity,

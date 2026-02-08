@@ -26,13 +26,18 @@ export function calculateDistance(
   return distance;
 }
 
-// Calculates the delivery amount based on cost type and distance
+const FLASH_RATE = 1.5;
+const FLASH_MAX_KM = 2;
+
+/** Calculates the delivery amount. Use backend calculateDeliveryFee when possible (multi-store + flash). */
 export function calculateAmount(
   costType: "fixed" | "per_km",
   deliveryRate: number,
-  distance: number
+  distance: number,
+  options?: { singleStore?: boolean }
 ): number {
-  return costType === "fixed" ? deliveryRate : (
-      Math.ceil(distance) * deliveryRate
-    );
+  if (options?.singleStore && distance < FLASH_MAX_KM && distance >= 0) {
+    return FLASH_RATE;
+  }
+  return costType === "fixed" ? deliveryRate : Math.ceil(distance) * deliveryRate;
 }

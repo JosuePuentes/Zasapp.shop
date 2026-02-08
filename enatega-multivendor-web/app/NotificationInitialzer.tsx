@@ -25,8 +25,19 @@ export default function NotificationInitializer() {
     FIREBASE_VAPID_KEY,
   } = useConfig();
 
-  useEffect( () => {
-   
+  useEffect(() => {
+    const isFirebaseReady =
+      FIREBASE_KEY &&
+      FIREBASE_AUTH_DOMAIN &&
+      FIREBASE_PROJECT_ID &&
+      FIREBASE_STORAGE_BUCKET &&
+      FIREBASE_MSG_SENDER_ID &&
+      FIREBASE_APP_ID;
+
+    if (!isFirebaseReady) {
+      return;
+    }
+
     const firebaseConfig = {
       apiKey: FIREBASE_KEY,
       authDomain: FIREBASE_AUTH_DOMAIN,
@@ -39,7 +50,7 @@ export default function NotificationInitializer() {
     const initNotifications = async () => {
       const localToken = localStorage.getItem("token");
       const userId = localStorage.getItem("userId");
-    
+
       if (
         Notification.permission === "default" &&
         localToken &&
@@ -47,8 +58,7 @@ export default function NotificationInitializer() {
       ) {
         const permission = await Notification.requestPermission();
 
-
-        if (permission == "granted") {
+        if (permission === "granted") {
           await mutatePrefs({
             variables: {
               orderNotification: true,
@@ -57,6 +67,7 @@ export default function NotificationInitializer() {
           });
 
           const { messaging } = setupFirebase(firebaseConfig);
+          if (!messaging) return;
           const registration = await navigator.serviceWorker.ready;
 
           const fcmToken = await getToken(messaging, {
