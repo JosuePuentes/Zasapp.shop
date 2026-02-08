@@ -12,9 +12,9 @@ import { useTranslations } from "next-intl";
 export default function ProductsMarketplaceScreen() {
   const t = useTranslations();
   const { CURRENCY_SYMBOL } = useConfig();
-  const { cartStoreIds, cart } = useUser();
+  const { cartStoreIds } = useUser();
   const { userAddress } = useUserAddress();
-  const [department, setDepartment] = useState<string>("");
+  const [department, _setDepartment] = useState<string>("");
   const [sameStoreFilter, setSameStoreFilter] = useState<string | null>(null);
 
   const clientLat = userAddress?.location?.coordinates?.[1];
