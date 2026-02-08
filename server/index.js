@@ -1,16 +1,17 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const { ApolloServer } = require("apollo-server-express");
 
 const Product = require("./models/Product");
+const typeDefs = require("./graphql/schema");
+const resolvers = require("./graphql/resolvers");
 
 const app = express();
 
-// Puerto: Render asigna process.env.PORT; en local usa 8001
 const PORT = process.env.PORT || 8001;
-
-// Conexión MongoDB
 const MONGODB_URI = process.env.MONGODB_URI;
+
 if (MONGODB_URI) {
   mongoose
     .connect(MONGODB_URI)
@@ -18,7 +19,6 @@ if (MONGODB_URI) {
     .catch((err) => console.error("MongoDB connection error:", err));
 }
 
-// CORS: permitir peticiones desde el frontend en Vercel
 const allowedOrigins = [
   "https://zasapp-shop.vercel.app",
   "http://localhost:3000",
@@ -47,49 +47,52 @@ app.use(
   })
 );
 
-// Body parser para GraphQL
 app.use(express.json());
 
-// Ruta GraphQL (placeholder: aquí va tu Apollo Server o tu lógica GraphQL real)
-app.use("/graphql", (req, res, next) => {
-  // Preflight OPTIONS
-  if (req.method === "OPTIONS") {
-    res.setHeader("Access-Control-Allow-Origin", req.headers.origin || allowedOrigins[0]);
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization, isauth, userid, x-client-type"
-    );
-    return res.sendStatus(200);
-  }
-  // TODO: conectar Apollo Server o tu API GraphQL aquí
-  res.status(503).json({
-    errors: [{ message: "GraphQL endpoint not configured yet. Add your Apollo Server here." }],
-  });
+const apolloServer = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: ({ req }) => ({ req }),
+  formatError: (err) => {
+    console.error("GraphQL error:", err);
+    return err;
+  },
 });
 
-// GET /api/products — listar todos los productos
-app.get("/api/products", async (req, res) => {
-  try {
-    if (!MONGODB_URI) {
-      return res.status(503).json({
-        error: "Database not configured",
-        products: [],
-      });
+async function start() {
+  await apolloServer.start();
+  apolloServer.applyMiddleware({ app, path: "/graphql", cors: false });
+}
+
+start().then(() => {
+  app.get("/api/products", async (req, res) => {
+    try {
+      if (!MONGODB_URI) {
+        return res.status(503).json({
+          error: "Database not configured",
+          products: [],
+        });
+      }
+      const products = await Product.find()
+        .populate("store")
+        .lean()
+        .sort({ createdAt: -1 });
+      const list = products.map((p) => ({
+        ...p,
+        price: p.costPrice * (1 + (p.marginPercent || 0) / 100),
+      }));
+      res.json({ products: list });
+    } catch (err) {
+      console.error("GET /api/products error:", err);
+      res.status(500).json({ error: "Failed to fetch products", products: [] });
     }
-    const products = await Product.find().lean().sort({ createdAt: -1 });
-    res.json({ products });
-  } catch (err) {
-    console.error("GET /api/products error:", err);
-    res.status(500).json({ error: "Failed to fetch products", products: [] });
-  }
-});
+  });
 
-// Health check para Render
-app.get("/", (req, res) => {
-  res.json({ ok: true, service: "zasapp-api" });
-});
+  app.get("/", (req, res) => {
+    res.json({ ok: true, service: "zasapp-api" });
+  });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 });

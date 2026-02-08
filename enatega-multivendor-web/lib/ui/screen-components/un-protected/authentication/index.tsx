@@ -46,7 +46,9 @@ export default function AuthModal({
     email: "",
     password: "",
     name: "",
+    lastName: "",
     phone: "",
+    deliveryAddress: "",
   });
 
   useEffect(() => {
@@ -55,7 +57,9 @@ export default function AuthModal({
         email: "",
         password: "",
         name: "",
+        lastName: "",
         phone: "",
+        deliveryAddress: "",
       });
     }
   }, [isAuthModalVisible]);

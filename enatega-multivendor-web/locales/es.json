@@ -375,6 +375,8 @@
   "notVerifiedButton": "No Verificado",
   "updatePhoneTitle": "Actualizar número de teléfono",
   "nameLabel": "Nombre",
+  "lastNameLabel": "Apellido",
+  "deliveryAddressLabel": "Dirección de entrega",
   "updateNameTitle": "Actualizar Nombre",
   "deleteAccountLabel": "Eliminar Cuenta",
   "deleteButton": "Eliminar",

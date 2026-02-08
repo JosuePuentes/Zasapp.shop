@@ -6,6 +6,30 @@ import { usePathname, useRouter } from "next/navigation";
 // Methods
 import { onUseLocalStorage } from "../utils/methods/local-storage";
 
+/** Rutas permitidas para usuario con role CLIENT (solo Marketplace, Carrito, Perfil) */
+const CLIENT_ALLOWED_PATHS = [
+  "/",
+  "/profile",
+  "/order",
+  "/restaurants",
+  "/store",
+  "/discovery",
+  "/search",
+  "/category",
+  "/mapview",
+  "/see-all",
+  "/about",
+  "/terms",
+  "/privacy",
+];
+
+function isClientAllowedPath(pathname: string): boolean {
+  const normalized = pathname.replace(/^\/(es|en)/, "") || "/";
+  return CLIENT_ALLOWED_PATHS.some(
+    (p) => normalized === p || normalized.startsWith(p + "/")
+  );
+}
+
 const AuthGuard = <T extends object>(Component: React.ComponentType<T>) => {
   const WrappedComponent = (props: T) => {
     const [isNavigating, setIsNavigating] = useState(true);
@@ -29,7 +53,16 @@ const AuthGuard = <T extends object>(Component: React.ComponentType<T>) => {
             setIsNavigating(false);
             router.push("/");
           }
+          return;
         }
+
+        const userRole = onUseLocalStorage("get", "userRole");
+        if (userRole === "CLIENT" && !isClientAllowedPath(pathname)) {
+          setIsNavigating(false);
+          router.replace("/");
+          return;
+        }
+
         setIsNavigating(false);
       } catch (err) {
         console.log(err);
@@ -39,9 +72,8 @@ const AuthGuard = <T extends object>(Component: React.ComponentType<T>) => {
     };
 
     useLayoutEffect(() => {
-      // Check if logged in
       onHandleUserAuthenticate();
-    }, []);
+    }, [pathname]);
 
     return isNavigating ? <></> : <Component {...props} />;
   };

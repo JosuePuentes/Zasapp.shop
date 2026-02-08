@@ -7,7 +7,14 @@ Esta carpeta contiene el **servidor/API** del proyecto.
 - **`.env`**: Variables de entorno con tu MongoDB y demás secretos (no se sube a GitHub).
 - **`.env.example`**: Plantilla sin contraseñas para quien clone el repo.
 
-**Siguiente paso:** Si tienes el código completo del API (Apollo Server, resolvers, modelos), intégralo en `index.js` en la ruta `/graphql` (reemplaza el placeholder). El CORS y `process.env.PORT` ya están configurados para Vercel y Render.
+**GraphQL (Apollo Server)** en `/graphql`:
+- **createUser**: registro de cliente (nombre, apellido, teléfono, correo, contraseña, dirección). Role por defecto: CLIENT.
+- **login**: tipo `email` o `credentials` con email y password.
+- **profile**: perfil del usuario autenticado (requiere header `Authorization: Bearer <token>`).
+- **searchProducts(department)**: productos de tiendas con `status: APPROVED` y `isActive: true`. Precio final = costPrice × (1 + marginPercent/100). Filtro opcional por categoría (Farmacia, Repuestos).
+- **configuration**: configuración básica para el front.
+
+Para que `searchProducts` devuelva resultados, crea al menos una **Store** con `status: "APPROVED"` y `isActive: true`, y **Product**s con `store` referenciando esa tienda, `costPrice`, `marginPercent` y `category`.
 
 ## MongoDB
 

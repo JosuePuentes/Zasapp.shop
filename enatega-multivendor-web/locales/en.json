@@ -376,6 +376,8 @@
   "not_verified": "Not Verified",
   "updatePhoneTitle": "Update phone number",
   "nameLabel": "Name",
+  "lastNameLabel": "Last name",
+  "deliveryAddressLabel": "Delivery address",
   "updateNameTitle": "Update Name",
   "deleteAccountLabel": "Delete Account",
   "deleteButton": "Delete",

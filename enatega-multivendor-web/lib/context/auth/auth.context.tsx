@@ -272,6 +272,9 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         });
         localStorage.setItem("token", userData.data.createUser.token);
         localStorage.setItem("userId", userData.data.createUser.userId);
+        if (userData.data.createUser.userTypeId) {
+          localStorage.setItem("userRole", userData.data.createUser.userTypeId);
+        }
         return userData.data.createUser as ICreateUserData;
       } else {
         return {} as ICreateUserData;
@@ -301,6 +304,9 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
       localStorage.setItem("token", data?.login?.token ?? "");
       localStorage.setItem("userId", data?.login?.userId ?? "");
+      if (data?.login?.userTypeId) {
+        localStorage.setItem("userRole", data.login.userTypeId);
+      }
       await fetchProfile();
       if (!data.login.emailIsVerified) {
         setActivePanel(5);

@@ -83,6 +83,8 @@ export const CREATE_USER = gql`
     $email: String
     $password: String
     $name: String
+    $lastName: String
+    $deliveryAddress: String
     $notificationToken: String
     $appleId: String
     $emailIsVerified: Boolean
@@ -94,6 +96,8 @@ export const CREATE_USER = gql`
         email: $email
         password: $password
         name: $name
+        lastName: $lastName
+        deliveryAddress: $deliveryAddress
         notificationToken: $notificationToken
         appleId: $appleId
         emailIsVerified: $emailIsVerified
@@ -104,6 +108,7 @@ export const CREATE_USER = gql`
       token
       tokenExpiration
       name
+      lastName
       phone
       phoneIsVerified
       email

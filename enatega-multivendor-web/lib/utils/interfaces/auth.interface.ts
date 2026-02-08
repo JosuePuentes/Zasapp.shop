@@ -12,9 +12,11 @@ export interface IAuthModalProps {
 
 export interface IAuthFormData {
   name?: string;
+  lastName?: string;
   email?: string;
   password?: string;
   phone?: string;
+  deliveryAddress?: string;
   type?: "default" | "google";
   isPhoneExists?: boolean;
 }
@@ -195,9 +197,11 @@ export interface ICreateUserArguments {
   email?: string;
   password?: string;
   name?: string;
+  lastName?: string;
+  deliveryAddress?: string;
   notificationToken?: string;
   appleId?: string;
-  emailIsVerified?: boolean; // optional, can be undefined
+  emailIsVerified?: boolean;
   isPhoneExists?: boolean;
 }
 export interface IVerificationEmailForChangePasswordProps {

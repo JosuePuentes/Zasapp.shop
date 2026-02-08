@@ -166,6 +166,8 @@ export default function SignUpWithEmail({
           email: formData.email,
           phone: formData.phone,
           name: formData.name,
+          lastName: formData.lastName,
+          deliveryAddress: formData.deliveryAddress,
           password: formData.password,
           emailIsVerified: false,
           isPhoneExists: isPhoneExists,
@@ -220,6 +222,16 @@ export default function SignUpWithEmail({
       </div>
       <div className="flex flex-col gap-y-1 my-3 w-full">
         <CustomTextField
+          value={formData.lastName}
+          showLabel={false}
+          name="lastName"
+          type="text"
+          placeholder={t("lastNameLabel")}
+          onChange={(e) => handleFormChange("lastName", e.target.value)}
+        />
+      </div>
+      <div className="flex flex-col gap-y-1 my-3 w-full">
+        <CustomTextField
           value={formData.email}
           showLabel={false}
           name="email"
@@ -245,6 +257,16 @@ export default function SignUpWithEmail({
           type="text"
           placeholder={t("phone_label")}
           onChange={(val) => handleFormChange("phone", val)}
+        />
+      </div>
+      <div className="flex flex-col gap-y-1 my-3 w-full">
+        <CustomTextField
+          value={formData.deliveryAddress}
+          showLabel={false}
+          name="deliveryAddress"
+          type="text"
+          placeholder={t("deliveryAddressLabel")}
+          onChange={(e) => handleFormChange("deliveryAddress", e.target.value)}
         />
       </div>
       <div className="flex flex-col gap-y-1 my-3 w-full">
