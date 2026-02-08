@@ -52,10 +52,9 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
   const baseUrl = (SERVER_URL || "").replace(/\/?$/, "/");
   const wsBaseUrl = (WS_SERVER_URL || "").replace(/\/?$/, "/");
 
-  // En el cliente usamos el proxy /api/graphql para evitar CORS con el backend en Render.
-  // En SSR (servidor) las peticiones van directo al backend (sin CORS).
-  const isClient = typeof window !== "undefined";
-  const httpUri = isClient ? "/api/graphql" : `${baseUrl}graphql`;
+  // Llamamos al backend directo (Render). CORS en el backend permite zasapp-shop.vercel.app.
+  // Así no dependemos del proxy /api/graphql en Vercel (que da 404 si Root Directory está mal).
+  const httpUri = `${baseUrl}graphql`;
 
   const httpLink = createHttpLink({
     uri: httpUri,
