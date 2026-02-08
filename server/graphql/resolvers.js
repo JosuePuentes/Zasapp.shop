@@ -18,6 +18,27 @@ const AccountReceivable = require("../models/AccountReceivable");
 const JWT_SECRET = process.env.JWT_SECRET || "zasapp-dev-secret-change-in-production";
 const TOKEN_EXPIRATION = "7d";
 
+// In-memory OTP store: key = email or phone, value = { code, expiresAt }
+const otpStore = new Map();
+const OTP_TTL_MS = 10 * 60 * 1000; // 10 minutes
+const OTP_LENGTH = 6;
+function generateOtp() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+function setOtp(key, code) {
+  otpStore.set(key, { code, expiresAt: Date.now() + OTP_TTL_MS });
+}
+function checkOtp(key, code) {
+  const entry = otpStore.get(key);
+  if (!entry || entry.expiresAt < Date.now()) {
+    otpStore.delete(key);
+    return false;
+  }
+  const ok = entry.code === code;
+  if (ok) otpStore.delete(key);
+  return ok;
+}
+
 const createToken = (user) =>
   jwt.sign(
     { userId: user._id.toString(), role: user.role },
@@ -390,6 +411,26 @@ const resolvers = {
         currencySymbol: "$",
         deliveryRate: 0,
         costType: "perKM",
+        skipEmailVerification: true,
+        skipMobileVerification: true,
+        testOtp: "123456",
+        twilioEnabled: false,
+        webClientID: null,
+        googleApiKey: null,
+        webAmplitudeApiKey: null,
+        googleMapLibraries: null,
+        googleColor: null,
+        webSentryUrl: null,
+        publishableKey: null,
+        clientId: null,
+        firebaseKey: null,
+        authDomain: null,
+        projectId: null,
+        storageBucket: null,
+        msgSenderId: null,
+        appId: null,
+        measurementId: null,
+        vapidKey: null,
       };
     },
 
@@ -1008,6 +1049,38 @@ const resolvers = {
         isSystem: m.isSystem ?? false,
         createdAt: m.createdAt?.toISOString?.(),
       };
+    },
+
+    sendOtpToEmail(_, { email }) {
+      if (!email || !String(email).trim()) return { result: false };
+      const key = String(email).toLowerCase().trim();
+      const code = generateOtp();
+      setOtp(key, code);
+      console.log("[OTP] Email", key, "→ código:", code, "(configura SMTP en producción para envío real)");
+      return { result: true };
+    },
+
+    sendOtpToPhoneNumber(_, { phone }) {
+      if (!phone || !String(phone).trim()) return { result: false };
+      const key = String(phone).trim();
+      const code = generateOtp();
+      setOtp(key, code);
+      console.log("[OTP] Teléfono", key, "→ código:", code, "(configura Twilio en producción para SMS real)");
+      return { result: true };
+    },
+
+    verifyOtp(_, { otp, email, phone }) {
+      const code = String(otp || "").trim();
+      if (!code) return { result: false };
+      if (email) {
+        const key = String(email).toLowerCase().trim();
+        return { result: checkOtp(key, code) };
+      }
+      if (phone) {
+        const key = String(phone).trim();
+        return { result: checkOtp(key, code) };
+      }
+      return { result: false };
     },
 
     async requestBusinessPartner(_, { storeId, partnerStoreId }) {

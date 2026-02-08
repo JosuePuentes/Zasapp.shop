@@ -210,6 +210,34 @@ const typeDefs = gql`
     currencySymbol: String
     deliveryRate: Float
     costType: String
+    skipEmailVerification: Boolean
+    skipMobileVerification: Boolean
+    testOtp: String
+    twilioEnabled: Boolean
+    webClientID: String
+    googleApiKey: String
+    webAmplitudeApiKey: String
+    googleMapLibraries: String
+    googleColor: String
+    webSentryUrl: String
+    publishableKey: String
+    clientId: String
+    firebaseKey: String
+    authDomain: String
+    projectId: String
+    storageBucket: String
+    msgSenderId: String
+    appId: String
+    measurementId: String
+    vapidKey: String
+  }
+
+  type SendOtpResult {
+    result: Boolean!
+  }
+
+  type VerifyOtpResult {
+    result: Boolean!
   }
 
   type RouteStopItem {
@@ -475,6 +503,9 @@ const typeDefs = gql`
     requestBusinessPartner(storeId: ID!, partnerStoreId: ID!): BusinessPartner!
     approveBusinessPartner(id: ID!, discountPercent: Float, creditDays: Int, creditLimit: Float): BusinessPartner!
     sendB2BMessage(storeId: ID!, partnerStoreId: ID!, body: String!): B2BChatMessage!
+    sendOtpToEmail(email: String!): SendOtpResult!
+    sendOtpToPhoneNumber(phone: String!): SendOtpResult!
+    verifyOtp(otp: String!, email: String, phone: String): VerifyOtpResult!
   }
 `;
 

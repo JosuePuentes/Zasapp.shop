@@ -114,10 +114,14 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       const error = err as ApolloError;
       console.error("Error while checking email:", error);
+      const raw = error.cause?.message || error.message || "";
+      const isNetworkError = /failed to fetch|network error|load failed/i.test(raw);
+      const message = isNetworkError ? t("server_connection_error") : (raw || t("error_checking_email"));
+
       showToast({
         type: "error",
         title: t("email_check_error"),
-        message: error.cause?.message || t("error_checking_email"),
+        message,
         duration: 3000
       });
       return {} as IEmailExists;
@@ -145,11 +149,14 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       const error = err as ApolloError;
       console.error("Error while checking phone:", error);
+      const raw = error.cause?.message || error.message || "";
+      const isNetworkError = /failed to fetch|network error|load failed/i.test(raw);
+      const message = isNetworkError ? t("server_connection_error") : (raw || t("error_checking_phone"));
 
       showToast({
         type: "error",
         title: t("phone_check_error"),
-        message: error.cause?.message || t("error_checking_phone"),
+        message,
         duration: 3000
       });
 
@@ -391,11 +398,15 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       const error = err as ApolloError;
       console.error("Error while sending OTP to email:", error);
+      const raw = error.cause?.message || error.message || "";
+      const isNetworkError = /failed to fetch|network error|load failed/i.test(raw);
+      const message = isNetworkError ? t("server_connection_error") : (raw || t("error_sending_otp_to_email"));
+
       showToast({
         type: "error",
         title: t("email_otp_error"),
-        message: error.cause?.message || t("error_sending_otp_to_email"),
-       duration: 3000
+        message,
+        duration: 3000
       });
     } finally {
       setIsLoading(false);
@@ -435,10 +446,14 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       const error = err as ApolloError;
       console.error("Error while sending OTP to phone:", error);
+      const raw = error.cause?.message || error.message || "";
+      const isNetworkError = /failed to fetch|network error|load failed/i.test(raw);
+      const message = isNetworkError ? t("server_connection_error") : (raw || t("error_sending_otp_to_phone"));
+
       showToast({
         type: "error",
         title: t("phone_otp_error"),
-        message: error.cause?.message || t("error_sending_otp_to_phone"),
+        message,
         duration: 3000
       });
     } finally {

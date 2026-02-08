@@ -168,6 +168,7 @@
   "phone_check_error": "Error al verificar teléfono",
   "phone_already_registered": "Este número de teléfono ya está registrado, por favor ingresa uno diferente.",
   "error_checking_phone": "Ocurrió un error al verificar el teléfono.",
+  "server_connection_error": "No se pudo conectar con el servidor. Comprueba tu conexión y que la URL del servidor sea correcta.",
   "password_reset": "Restablecimiento de contraseña",
   "password_reset_success": "Tu contraseña ha sido restablecida exitosamente.",
   "password_reset_error": "Error al restablecer contraseña",
