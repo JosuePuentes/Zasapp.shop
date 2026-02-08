@@ -69,6 +69,74 @@ const typeDefs = gql`
     lng: Float
     publicName: String
     brandColor: String
+    owner: ID
+    plan: String
+    rif: String
+    companyName: String
+    antiquity: Int
+    president: String
+    workersCount: Int
+    address: String
+  }
+
+  type Supplier {
+    _id: ID!
+    store: ID!
+    rif: String
+    companyName: String!
+    contactName: String
+    contactPhone: String
+    contactEmail: String
+    address: String
+  }
+
+  type PurchaseItem {
+    product: ID!
+    quantity: Int!
+    unitCost: Float!
+    lot: String
+    expiryDate: String
+  }
+
+  type Purchase {
+    _id: ID!
+    store: ID!
+    supplier: Supplier
+    items: [PurchaseItem!]!
+    total: Float!
+    purchaseDate: String
+    notes: String
+  }
+
+  type Employee {
+    _id: ID!
+    store: ID!
+    name: String!
+    position: String
+    hasCommission: Boolean!
+    commissionPercent: Float
+    isActive: Boolean!
+  }
+
+  type Expense {
+    _id: ID!
+    store: ID!
+    description: String!
+    amount: Float!
+    category: String!
+    expenseDate: String
+  }
+
+  type AccountPayable {
+    _id: ID!
+    store: ID!
+    supplier: Supplier
+    purchase: ID
+    amount: Float!
+    amountPaid: Float!
+    dueDate: String!
+    status: String!
+    paidAt: String
   }
 
   type DeliveryFeeResult {
@@ -88,6 +156,9 @@ const typeDefs = gql`
     category: String!
     store: Store
     external_id: String
+    brand: String
+    lot: String
+    expiryDate: String
   }
 
   type Configuration {
@@ -153,6 +224,15 @@ const typeDefs = gql`
     platformPercent: Int!
   }
 
+  type DashboardSales {
+    totalPhysical: Float!
+    totalOnline: Float!
+    total: Float!
+    expenses: Float!
+    accountsPaid: Float!
+    net: Float!
+  }
+
   input CreateUserInput {
     name: String!
     lastName: String
@@ -164,6 +244,69 @@ const typeDefs = gql`
     appleId: String
     emailIsVerified: Boolean
     isPhoneExists: Boolean
+  }
+
+  input StoreOnboardingInput {
+    storeId: ID!
+    rif: String
+    companyName: String
+    antiquity: Int
+    president: String
+    workersCount: Int
+    address: String
+    lat: Float
+    lng: Float
+  }
+
+  input SupplierInput {
+    storeId: ID!
+    rif: String
+    companyName: String!
+    contactName: String
+    contactPhone: String
+    contactEmail: String
+    address: String
+  }
+
+  input PurchaseItemInput {
+    productId: ID!
+    quantity: Int!
+    unitCost: Float!
+    lot: String
+    expiryDate: String
+  }
+
+  input CreatePurchaseInput {
+    storeId: ID!
+    supplierId: ID!
+    items: [PurchaseItemInput!]!
+    notes: String
+    dueInDays: Int
+  }
+
+  input EmployeeInput {
+    storeId: ID!
+    name: String!
+    position: String
+    hasCommission: Boolean
+    commissionPercent: Float
+  }
+
+  input ExpenseInput {
+    storeId: ID!
+    description: String!
+    amount: Float!
+    category: String
+    expenseDate: String
+  }
+
+  input BulkProductInput {
+    code: String
+    description: String!
+    brand: String
+    cost: Float!
+    marginPercent: Float!
+    category: String
   }
 
   input UpdateDriverProfileInput {
@@ -216,6 +359,13 @@ const typeDefs = gql`
     driverRoutes: [Route!]!
     driverAvailableRoutes: [Route!]!
     route(routeId: ID!): Route
+    storesByOwner(ownerId: ID!): [Store!]!
+    suppliersByStore(storeId: ID!): [Supplier!]!
+    purchasesByStore(storeId: ID!, limit: Int): [Purchase!]!
+    employeesByStore(storeId: ID!): [Employee!]!
+    expensesByStore(storeId: ID!, from: String, to: String): [Expense!]!
+    accountPayablesByStore(storeId: ID!, status: String): [AccountPayable!]!
+    dashboardSales(storeId: ID!, from: String, to: String): DashboardSales
   }
 
   type Mutation {
@@ -232,6 +382,15 @@ const typeDefs = gql`
     takeRoute(routeId: ID!): Route!
     updateRouteStatus(routeId: ID!, status: String!): Route!
     reportDriverLocation(routeId: ID!, lat: Float!, lng: Float!): Boolean
+    updateStoreOnboarding(input: StoreOnboardingInput!): Store!
+    createSupplier(input: SupplierInput!): Supplier!
+    updateSupplier(id: ID!, input: SupplierInput!): Supplier!
+    createPurchase(input: CreatePurchaseInput!): Purchase!
+    createEmployee(input: EmployeeInput!): Employee!
+    updateEmployee(id: ID!, input: EmployeeInput!): Employee!
+    createExpense(input: ExpenseInput!): Expense!
+    payAccountPayable(id: ID!, amount: Float!): AccountPayable!
+    bulkImportProducts(storeId: ID!, products: [BulkProductInput!]!): Int!
   }
 `;
 

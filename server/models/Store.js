@@ -20,6 +20,9 @@ const pointSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const PLANS = ["Individual", "Pyme", "Corporativo"];
+const STORES_BY_PLAN = { Individual: 1, Pyme: 5, Corporativo: 20 };
+
 const storeSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -38,9 +41,19 @@ const storeSchema = new mongoose.Schema(
     location: { type: pointSchema },
     publicName: { type: String, trim: true },
     brandColor: { type: String, trim: true },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    plan: { type: String, enum: PLANS, default: "Individual" },
+    rif: { type: String, trim: true },
+    companyName: { type: String, trim: true },
+    antiquity: { type: Number, min: 0 },
+    president: { type: String, trim: true },
+    workersCount: { type: Number, min: 0 },
+    address: { type: String, trim: true },
   },
   { timestamps: true }
 );
+
+storeSchema.index({ owner: 1 });
 
 storeSchema.index({ location: "2dsphere" });
 storeSchema.index({ department: 1, createdAt: 1 });
@@ -58,4 +71,6 @@ storeSchema.pre("save", async function (next) {
 
 module.exports = mongoose.model("Store", storeSchema);
 module.exports.STATUS = STATUS;
+module.exports.PLANS = PLANS;
+module.exports.STORES_BY_PLAN = STORES_BY_PLAN;
 module.exports.BRAND_COLOR_PALETTE = BRAND_COLOR_PALETTE;

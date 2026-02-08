@@ -24,6 +24,18 @@ export const ROUTES = [
     route: '/management/commission-rates',
   },
   {
+    text: 'ERP Dashboard',
+    route: '/management/erp/dashboard',
+  },
+  {
+    text: 'Proveedores',
+    route: '/management/erp/suppliers',
+  },
+  {
+    text: 'Carga masiva productos',
+    route: '/management/erp/products-import',
+  },
+  {
     text: 'Withdraw Request',
     route: '/management/withdraw-requests',
   },

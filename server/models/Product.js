@@ -14,6 +14,9 @@ const productSchema = new mongoose.Schema(
     },
     store: { type: mongoose.Schema.Types.ObjectId, ref: "Store" },
     external_id: { type: String, trim: true, sparse: true },
+    brand: { type: String, trim: true },
+    lot: { type: String, trim: true },
+    expiryDate: { type: Date },
   },
   { timestamps: true }
 );

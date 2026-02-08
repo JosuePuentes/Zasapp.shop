@@ -174,7 +174,24 @@ export default function MakeSidebar() {
           route: '/management/commission-rates',
           isParent: false,
         },
-
+        {
+          text: 'ERP Dashboard',
+          label: t('ERP Dashboard') || 'ERP Dashboard',
+          route: '/management/erp/dashboard',
+          isParent: false,
+        },
+        {
+          text: 'Proveedores',
+          label: t('Proveedores') || 'Proveedores',
+          route: '/management/erp/suppliers',
+          isParent: false,
+        },
+        {
+          text: 'Carga masiva productos',
+          label: t('Bulk Import Products') || 'Carga masiva productos',
+          route: '/management/erp/products-import',
+          isParent: false,
+        },
         {
           text: 'Notification',
           label: t('Notification'),

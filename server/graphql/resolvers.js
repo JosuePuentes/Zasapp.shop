@@ -5,6 +5,11 @@ const Product = require("../models/Product");
 const DeliveryWallet = require("../models/DeliveryWallet");
 const Route = require("../models/Route");
 const { splitFee } = require("../models/DeliveryWallet");
+const Supplier = require("../models/Supplier");
+const Purchase = require("../models/Purchase");
+const Employee = require("../models/Employee");
+const Expense = require("../models/Expense");
+const AccountPayable = require("../models/AccountPayable");
 
 const JWT_SECRET = process.env.JWT_SECRET || "zasapp-dev-secret-change-in-production";
 const TOKEN_EXPIRATION = "7d";
@@ -399,6 +404,121 @@ const resolvers = {
       }
       return null;
     },
+
+    async storesByOwner(_, { ownerId }) {
+      if (!ownerId) return [];
+      const stores = await Store.find({ owner: ownerId }).lean();
+      return stores.map((s) => ({
+        ...s,
+        _id: s._id.toString(),
+        owner: s.owner?.toString(),
+      }));
+    },
+
+    async suppliersByStore(_, { storeId }) {
+      if (!storeId) return [];
+      const list = await Supplier.find({ store: storeId }).lean();
+      return list.map((s) => ({ ...s, _id: s._id.toString(), store: s.store?.toString() }));
+    },
+
+    async purchasesByStore(_, { storeId, limit: limitArg }) {
+      if (!storeId) return [];
+      const limit = Math.min(limitArg || 50, 200);
+      const list = await Purchase.find({ store: storeId })
+        .populate("supplier")
+        .sort({ purchaseDate: -1 })
+        .limit(limit)
+        .lean();
+      return list.map((p) => ({
+        _id: p._id.toString(),
+        store: p.store?.toString(),
+        supplier: p.supplier ? { ...p.supplier, _id: p.supplier._id.toString(), store: p.supplier.store?.toString() } : null,
+        items: (p.items || []).map((i) => ({
+          product: i.product?.toString(),
+          quantity: i.quantity,
+          unitCost: i.unitCost,
+          lot: i.lot,
+          expiryDate: i.expiryDate?.toISOString?.(),
+        })),
+        total: p.total,
+        purchaseDate: p.purchaseDate?.toISOString?.(),
+        notes: p.notes,
+      }));
+    },
+
+    async employeesByStore(_, { storeId }) {
+      if (!storeId) return [];
+      const list = await Employee.find({ store: storeId }).lean();
+      return list.map((e) => ({
+        ...e,
+        _id: e._id.toString(),
+        store: e.store?.toString(),
+      }));
+    },
+
+    async expensesByStore(_, { storeId, from, to }) {
+      if (!storeId) return [];
+      const q = { store: storeId };
+      if (from || to) {
+        q.expenseDate = {};
+        if (from) q.expenseDate.$gte = new Date(from);
+        if (to) q.expenseDate.$lte = new Date(to);
+      }
+      const list = await Expense.find(q).sort({ expenseDate: -1 }).lean();
+      return list.map((e) => ({
+        ...e,
+        _id: e._id.toString(),
+        store: e.store?.toString(),
+        expenseDate: e.expenseDate?.toISOString?.(),
+      }));
+    },
+
+    async accountPayablesByStore(_, { storeId, status: statusFilter }) {
+      if (!storeId) return [];
+      const q = { store: storeId };
+      if (statusFilter) q.status = statusFilter;
+      const list = await AccountPayable.find(q).populate("supplier").sort({ dueDate: 1 }).lean();
+      return list.map((a) => ({
+        _id: a._id.toString(),
+        store: a.store?.toString(),
+        supplier: a.supplier ? { ...a.supplier, _id: a.supplier._id.toString(), store: a.supplier.store?.toString() } : null,
+        purchase: a.purchase?.toString(),
+        amount: a.amount,
+        amountPaid: a.amountPaid ?? 0,
+        dueDate: a.dueDate?.toISOString?.(),
+        status: a.status,
+        paidAt: a.paidAt?.toISOString?.(),
+      }));
+    },
+
+    async dashboardSales(_, { storeId, from, to }) {
+      if (!storeId) return { totalPhysical: 0, totalOnline: 0, total: 0, expenses: 0, accountsPaid: 0, net: 0 };
+      const mongoose = require("mongoose");
+      const fromD = from ? new Date(from) : new Date(0);
+      const toD = to ? new Date(to) : new Date();
+      const storeObjId = mongoose.Types.ObjectId.isValid(storeId) ? new mongoose.Types.ObjectId(storeId) : null;
+      if (!storeObjId) return { totalPhysical: 0, totalOnline: 0, total: 0, expenses: 0, accountsPaid: 0, net: 0 };
+      const Order = require("../models/Order");
+      const delivered = await Order.find({ status: "DELIVERED", createdAt: { $gte: fromD, $lte: toD } }).lean();
+      let totalOnline = 0;
+      for (const o of delivered) {
+        const route = await Route.findOne({ orderId: o._id }).lean();
+        if (route && route.driver && o.deliveryFee) totalOnline += o.deliveryFee;
+      }
+      const expenses = await Expense.aggregate([{ $match: { store: storeObjId, expenseDate: { $gte: fromD, $lte: toD } } }, { $group: { _id: null, sum: { $sum: "$amount" } } }]);
+      const paid = await AccountPayable.aggregate([{ $match: { store: storeObjId, status: "PAID", paidAt: { $gte: fromD, $lte: toD } } }, { $group: { _id: null, sum: { $sum: "$amountPaid" } } }]);
+      const expSum = expenses[0]?.sum ?? 0;
+      const paidSum = paid[0]?.sum ?? 0;
+      const total = Math.round(totalOnline * 100) / 100;
+      return {
+        totalPhysical: 0,
+        totalOnline,
+        total,
+        expenses: expSum,
+        accountsPaid: paidSum,
+        net: Math.round((total - expSum - paidSum) * 100) / 100,
+      };
+    },
   },
 
   Mutation: {
@@ -527,8 +647,190 @@ const resolvers = {
       if (!userId) return false;
       const route = await Route.findOne({ _id: routeId, driver: userId });
       if (!route) return false;
-      // Store last position for tracking; could be saved to a DriverLocation collection
       return true;
+    },
+
+    async updateStoreOnboarding(_, { input }) {
+      const { storeId, rif, companyName, antiquity, president, workersCount, address, lat, lng } = input || {};
+      const store = await Store.findById(storeId);
+      if (!store) throw new Error("Tienda no encontrada");
+      if (rif != null) store.rif = rif;
+      if (companyName != null) store.companyName = companyName;
+      if (antiquity != null) store.antiquity = antiquity;
+      if (president != null) store.president = president;
+      if (workersCount != null) store.workersCount = workersCount;
+      if (address != null) store.address = address;
+      if (lat != null && lng != null) store.location = { type: "Point", coordinates: [lng, lat] };
+      await store.save();
+      const s = await Store.findById(storeId).lean();
+      return { ...s, _id: s._id.toString(), owner: s.owner?.toString() };
+    },
+
+    async createSupplier(_, { input }) {
+      const { storeId, rif, companyName, contactName, contactPhone, contactEmail, address } = input || {};
+      if (!storeId || !companyName) throw new Error("storeId y companyName son obligatorios");
+      const sup = await Supplier.create({
+        store: storeId,
+        rif: rif || "",
+        companyName,
+        contactName: contactName || "",
+        contactPhone: contactPhone || "",
+        contactEmail: (contactEmail || "").toLowerCase(),
+        address: address || "",
+      });
+      const s = await Supplier.findById(sup._id).lean();
+      return { ...s, _id: s._id.toString(), store: s.store?.toString() };
+    },
+
+    async updateSupplier(_, { id, input }) {
+      const sup = await Supplier.findById(id);
+      if (!sup) throw new Error("Proveedor no encontrado");
+      if (input.rif != null) sup.rif = input.rif;
+      if (input.companyName != null) sup.companyName = input.companyName;
+      if (input.contactName != null) sup.contactName = input.contactName;
+      if (input.contactPhone != null) sup.contactPhone = input.contactPhone;
+      if (input.contactEmail != null) sup.contactEmail = input.contactEmail;
+      if (input.address != null) sup.address = input.address;
+      await sup.save();
+      const s = await Supplier.findById(id).lean();
+      return { ...s, _id: s._id.toString(), store: s.store?.toString() };
+    },
+
+    async createPurchase(_, { input }) {
+      const { storeId, supplierId, items, notes, dueInDays } = input || {};
+      if (!storeId || !supplierId || !items?.length) throw new Error("storeId, supplierId e items son obligatorios");
+      let total = 0;
+      const purchaseItems = [];
+      for (const it of items) {
+        const lineTotal = it.quantity * it.unitCost;
+        total += lineTotal;
+        purchaseItems.push({
+          product: it.productId,
+          quantity: it.quantity,
+          unitCost: it.unitCost,
+          lot: it.lot || undefined,
+          expiryDate: it.expiryDate ? new Date(it.expiryDate) : undefined,
+        });
+        const product = await Product.findById(it.productId);
+        if (product) {
+          product.stock = (product.stock || 0) + it.quantity;
+          if (it.lot) product.lot = it.lot;
+          if (it.expiryDate) product.expiryDate = new Date(it.expiryDate);
+          await product.save();
+        }
+      }
+      const purchase = await Purchase.create({
+        store: storeId,
+        supplier: supplierId,
+        items: purchaseItems,
+        total: Math.round(total * 100) / 100,
+        notes: notes || "",
+      });
+      const due = new Date();
+      due.setDate(due.getDate() + (dueInDays || 30));
+      await AccountPayable.create({
+        store: storeId,
+        supplier: supplierId,
+        purchase: purchase._id,
+        amount: purchase.total,
+        dueDate: due,
+        status: "PENDING",
+      });
+      const p = await Purchase.findById(purchase._id).populate("supplier").lean();
+      return {
+        _id: p._id.toString(),
+        store: p.store?.toString(),
+        supplier: p.supplier ? { ...p.supplier, _id: p.supplier._id.toString(), store: p.supplier.store?.toString() } : null,
+        items: (p.items || []).map((i) => ({ product: i.product?.toString(), quantity: i.quantity, unitCost: i.unitCost, lot: i.lot, expiryDate: i.expiryDate?.toISOString?.() })),
+        total: p.total,
+        purchaseDate: p.purchaseDate?.toISOString?.(),
+        notes: p.notes,
+      };
+    },
+
+    async createEmployee(_, { input }) {
+      const { storeId, name, position, hasCommission, commissionPercent } = input || {};
+      if (!storeId || !name) throw new Error("storeId y name son obligatorios");
+      const emp = await Employee.create({
+        store: storeId,
+        name,
+        position: position || "",
+        hasCommission: hasCommission ?? false,
+        commissionPercent: commissionPercent ?? 0,
+      });
+      const e = await Employee.findById(emp._id).lean();
+      return { ...e, _id: e._id.toString(), store: e.store?.toString() };
+    },
+
+    async updateEmployee(_, { id, input }) {
+      const emp = await Employee.findById(id);
+      if (!emp) throw new Error("Empleado no encontrado");
+      if (input.name != null) emp.name = input.name;
+      if (input.position != null) emp.position = input.position;
+      if (input.hasCommission != null) emp.hasCommission = input.hasCommission;
+      if (input.commissionPercent != null) emp.commissionPercent = input.commissionPercent;
+      await emp.save();
+      const e = await Employee.findById(id).lean();
+      return { ...e, _id: e._id.toString(), store: e.store?.toString() };
+    },
+
+    async createExpense(_, { input }) {
+      const { storeId, description, amount, category, expenseDate } = input || {};
+      if (!storeId || !description || amount == null) throw new Error("storeId, description y amount son obligatorios");
+      const exp = await Expense.create({
+        store: storeId,
+        description,
+        amount: Number(amount),
+        category: category || "OTHER",
+        expenseDate: expenseDate ? new Date(expenseDate) : new Date(),
+      });
+      const e = await Expense.findById(exp._id).lean();
+      return { ...e, _id: e._id.toString(), store: e.store?.toString(), expenseDate: e.expenseDate?.toISOString?.() };
+    },
+
+    async payAccountPayable(_, { id, amount }) {
+      const ap = await AccountPayable.findById(id);
+      if (!ap) throw new Error("Cuenta por pagar no encontrada");
+      const paid = (ap.amountPaid || 0) + Number(amount);
+      ap.amountPaid = paid;
+      ap.status = paid >= ap.amount ? "PAID" : "PARTIAL";
+      if (ap.status === "PAID") ap.paidAt = new Date();
+      await ap.save();
+      const a = await AccountPayable.findById(id).populate("supplier").lean();
+      return {
+        _id: a._id.toString(),
+        store: a.store?.toString(),
+        supplier: a.supplier ? { ...a.supplier, _id: a.supplier._id.toString(), store: a.supplier.store?.toString() } : null,
+        purchase: a.purchase?.toString(),
+        amount: a.amount,
+        amountPaid: a.amountPaid,
+        dueDate: a.dueDate?.toISOString?.(),
+        status: a.status,
+        paidAt: a.paidAt?.toISOString?.(),
+      };
+    },
+
+    async bulkImportProducts(_, { storeId, products: productsInput }) {
+      if (!storeId || !productsInput?.length) throw new Error("storeId y products son obligatorios");
+      let count = 0;
+      for (const row of productsInput) {
+        const name = row.description || row.code || "Producto";
+        const cost = Number(row.cost) || 0;
+        const margin = Number(row.marginPercent) || 0;
+        const category = row.category || "Farmacia";
+        await Product.create({
+          store: storeId,
+          name,
+          costPrice: cost,
+          marginPercent: margin,
+          stock: 0,
+          category: ["Farmacia", "Repuestos"].includes(category) ? category : "Farmacia",
+          external_id: row.code || undefined,
+          brand: row.brand || undefined,
+        });
+        count++;
+      }
+      return count;
     },
   },
 };
