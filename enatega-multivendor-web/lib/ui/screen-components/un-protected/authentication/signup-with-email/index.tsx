@@ -53,11 +53,9 @@ export default function SignUpWithEmail({
     fetchProfile();
   }, []);
 
-  // Validation
+  // Validation: mínimo 6 caracteres (el backend no exige mayúscula, número ni carácter especial)
   const validatePassword = (password: string) => {
-    const strongPasswordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
-    return strongPasswordRegex.test(password);
+    return typeof password === "string" && password.length >= 6;
   };
 
   // Handlers
@@ -99,12 +97,12 @@ export default function SignUpWithEmail({
         return;
       }
 
-      // Password strength
+      // Password: mínimo 6 caracteres
       if (!validatePassword(formData.password || "")) {
         showToast({
           type: "error",
           title: t("create_user_label"),
-          message: t("password_not_strong_enough_message"),
+          message: t("password_min") || "La contraseña debe tener al menos 6 caracteres.",
         });
         return;
       }
