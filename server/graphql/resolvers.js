@@ -10,6 +10,10 @@ const Purchase = require("../models/Purchase");
 const Employee = require("../models/Employee");
 const Expense = require("../models/Expense");
 const AccountPayable = require("../models/AccountPayable");
+const ExchangeRate = require("../models/ExchangeRate");
+const BusinessPartner = require("../models/BusinessPartner");
+const B2BChatMessage = require("../models/B2BChatMessage");
+const AccountReceivable = require("../models/AccountReceivable");
 
 const JWT_SECRET = process.env.JWT_SECRET || "zasapp-dev-secret-change-in-production";
 const TOKEN_EXPIRATION = "7d";
@@ -167,6 +171,7 @@ const resolvers = {
         addresses: address,
         favourite: [],
         role: user.role,
+        clientType: user.clientType || "PERSONAL",
       };
     },
 
@@ -177,7 +182,8 @@ const resolvers = {
         (p) => p.store && p.store.status === "APPROVED" && p.store.isActive === true
       );
       let result = filtered.map((p) => {
-        const finalPrice = p.costPrice * (1 + (p.marginPercent || 0) / 100);
+        const margin = (p.marginPercent || 0) / 100;
+        const finalPrice = margin >= 1 ? p.costPrice : p.costPrice / (1 - margin);
         const store = p.store
           ? {
               ...p.store,
@@ -249,7 +255,8 @@ const resolvers = {
         (p) => p.store && p.store.status === "APPROVED" && p.store.isActive === true
       );
       return filtered.map((p) => {
-        const finalPrice = p.costPrice * (1 + (p.marginPercent || 0) / 100);
+        const margin = (p.marginPercent || 0) / 100;
+        const finalPrice = margin >= 1 ? p.costPrice : p.costPrice / (1 - margin);
         const store = p.store
           ? {
               ...p.store,
@@ -267,6 +274,61 @@ const resolvers = {
           store,
         };
       });
+    },
+
+    async searchProductsComparative(_, { buyerStoreId, department, onlyAllies }) {
+      if (!buyerStoreId) return [];
+      const query = department ? { category: department } : {};
+      const products = await Product.find(query).populate("store").lean();
+      const filtered = products.filter(
+        (p) => p.store && p.store.status === "APPROVED" && p.store.isActive === true
+      );
+      const buyerStore = await Store.findById(buyerStoreId).lean();
+      const buyerDepartment = buyerStore?.department || "Otro";
+      const allies = await BusinessPartner.find({ store: buyerStoreId, isApproved: true }).lean();
+      const allyMap = new Map();
+      allies.forEach((a) => {
+        const id = a.partnerStore?.toString();
+        if (id) allyMap.set(id, a);
+      });
+      const allyStoreIds = new Set(allyMap.keys());
+      const result = [];
+      for (const p of filtered) {
+        const store = p.store;
+        let segment = "DETAL";
+        if (store.isDistributor) {
+          segment = allyStoreIds.has(store._id.toString()) ? "MY_ALLIES" : (store.department === buyerDepartment ? "OTHER_DISTRIBUTORS" : "OTHER_DISTRIBUTORS");
+        }
+        if (onlyAllies && segment !== "MY_ALLIES") continue;
+        const margin = (p.marginPercent || 0) / 100;
+        const finalPrice = margin >= 1 ? p.costPrice : p.costPrice / (1 - margin);
+        const price = Math.round(finalPrice * 100) / 100;
+        const ally = segment === "MY_ALLIES" ? allyMap.get(store._id.toString()) : null;
+        const allyDiscountPercent = ally?.discountPercent ?? 0;
+        const priceWithDiscount = allyDiscountPercent > 0 ? Math.round(price * (1 - allyDiscountPercent / 100) * 100) / 100 : price;
+        const storeMapped = store
+          ? {
+              ...store,
+              _id: store._id.toString(),
+              lat: store.location?.coordinates?.[1],
+              lng: store.location?.coordinates?.[0],
+              publicName: storePublicName(store),
+              brandColor: storeBrandColor(store),
+            }
+          : null;
+        result.push({
+          ...p,
+          _id: p._id.toString(),
+          price,
+          priceWithDiscount,
+          store: storeMapped,
+          segment,
+          allyDiscountPercent: segment === "MY_ALLIES" ? allyDiscountPercent : null,
+          allyCreditDays: segment === "MY_ALLIES" && ally ? (ally.creditDays ?? 0) : null,
+          allyCreditLimit: segment === "MY_ALLIES" && ally ? (ally.creditLimit ?? 0) : null,
+        });
+      }
+      return result;
     },
 
     async calculateDeliveryFee(_, { storeIds, clientLat, clientLng }) {
@@ -442,6 +504,9 @@ const resolvers = {
         })),
         total: p.total,
         purchaseDate: p.purchaseDate?.toISOString?.(),
+        paymentCurrency: p.paymentCurrency || "BCV",
+        purchaseCurrencyType: p.purchaseCurrencyType || "BCV",
+        isParallelRate: p.isParallelRate ?? false,
         notes: p.notes,
       }));
     },
@@ -519,11 +584,145 @@ const resolvers = {
         net: Math.round((total - expSum - paidSum) * 100) / 100,
       };
     },
+
+    async latestRates(_, { storeId }) {
+      if (!storeId) return null;
+      const latest = await ExchangeRate.findOne({ store: storeId }).sort({ createdAt: -1 }).lean();
+      if (!latest) return null;
+      const rateBcv = latest.rateBcv || 1;
+      const rateCalle = latest.rateCalle || 1;
+      const differentialPercent = rateBcv > 0 ? ((rateCalle - rateBcv) / rateBcv) * 100 : 0;
+      return {
+        storeId: latest.store?.toString(),
+        rateBcv,
+        rateCalle,
+        differentialPercent: Math.round(differentialPercent * 100) / 100,
+        effectiveDate: latest.effectiveDate?.toISOString?.(),
+      };
+    },
+
+    async exchangeRatesByStore(_, { storeId, limit: limitArg }) {
+      if (!storeId) return [];
+      const limit = Math.min(limitArg || 30, 100);
+      const list = await ExchangeRate.find({ store: storeId }).sort({ createdAt: -1 }).limit(limit).lean();
+      return list.map((r) => ({
+        _id: r._id.toString(),
+        store: r.store?.toString(),
+        rateBcv: r.rateBcv,
+        rateCalle: r.rateCalle,
+        effectiveDate: r.effectiveDate?.toISOString?.(),
+      }));
+    },
+
+    async inventoryByCosteo(_, { storeId }) {
+      if (!storeId) return { storeId, bcvCount: 0, parallelCount: 0, bcvValue: 0, parallelValue: 0 };
+      const mongoose = require("mongoose");
+      const storeObjId = mongoose.Types.ObjectId.isValid(storeId) ? new mongoose.Types.ObjectId(storeId) : null;
+      if (!storeObjId) return { storeId, bcvCount: 0, parallelCount: 0, bcvValue: 0, parallelValue: 0 };
+      const [bcvAgg, parallelAgg] = await Promise.all([
+        Product.aggregate([
+          { $match: { store: storeObjId, $or: [{ purchaseCurrencyType: "BCV" }, { isParallelRate: { $ne: true } }, { purchaseCurrencyType: { $exists: false } }] } },
+          { $group: { _id: null, count: { $sum: 1 }, value: { $sum: { $multiply: ["$costPrice", "$stock"] } } } },
+        ]),
+        Product.aggregate([
+          { $match: { store: storeObjId, isParallelRate: true } },
+          { $group: { _id: null, count: { $sum: 1 }, value: { $sum: { $multiply: ["$costPrice", "$stock"] } } } },
+        ]),
+      ]);
+      const bcvCount = bcvAgg[0]?.count ?? 0;
+      const parallelCount = parallelAgg[0]?.count ?? 0;
+      const bcvValue = Math.round((bcvAgg[0]?.value ?? 0) * 100) / 100;
+      const parallelValue = Math.round((parallelAgg[0]?.value ?? 0) * 100) / 100;
+      return { storeId, bcvCount, parallelCount, bcvValue, parallelValue };
+    },
+
+    async businessPartnersByStore(_, { storeId }) {
+      if (!storeId) return [];
+      const list = await BusinessPartner.find({ store: storeId }).populate("partnerStore").sort({ createdAt: -1 }).lean();
+      return list.map((b) => ({
+        _id: b._id.toString(),
+        store: b.store?.toString(),
+        partnerStore: b.partnerStore?.toString(),
+        isApproved: b.isApproved ?? false,
+        discountPercent: b.discountPercent ?? 0,
+        creditDays: b.creditDays ?? 0,
+        creditLimit: b.creditLimit ?? 0,
+        requestedAt: b.requestedAt?.toISOString?.(),
+        approvedAt: b.approvedAt?.toISOString?.(),
+      }));
+    },
+
+    async businessPartnerRequests(_, { partnerStoreId }) {
+      if (!partnerStoreId) return [];
+      const list = await BusinessPartner.find({ partnerStore: partnerStoreId }).populate("store").sort({ createdAt: -1 }).lean();
+      return list.map((b) => ({
+        _id: b._id.toString(),
+        store: b.store?.toString(),
+        partnerStore: b.partnerStore?.toString(),
+        isApproved: b.isApproved ?? false,
+        discountPercent: b.discountPercent ?? 0,
+        creditDays: b.creditDays ?? 0,
+        creditLimit: b.creditLimit ?? 0,
+        requestedAt: b.requestedAt?.toISOString?.(),
+        approvedAt: b.approvedAt?.toISOString?.(),
+      }));
+    },
+
+    async b2bBusinessCard(_, { storeId }) {
+      if (!storeId) return null;
+      const store = await Store.findById(storeId).lean();
+      if (!store) return null;
+      return {
+        storeId: store._id.toString(),
+        storeName: store.name || store.publicName || "Tienda",
+        rif: store.rif || "",
+        address: store.address || "",
+        estimatedVolume: store.workersCount != null ? `Estimado por ${store.workersCount} trabajadores` : "",
+      };
+    },
+
+    async b2bChatMessages(_, { storeId, partnerStoreId, limit: limitArg }) {
+      if (!storeId || !partnerStoreId) return [];
+      const limit = Math.min(limitArg || 50, 100);
+      const list = await B2BChatMessage.find({
+        $or: [
+          { fromStore: storeId, toStore: partnerStoreId },
+          { fromStore: partnerStoreId, toStore: storeId },
+        ],
+      })
+        .sort({ createdAt: 1 })
+        .limit(limit)
+        .lean();
+      return list.map((m) => ({
+        _id: m._id.toString(),
+        fromStore: m.fromStore?.toString(),
+        toStore: m.toStore?.toString(),
+        body: m.body,
+        isSystem: m.isSystem ?? false,
+        createdAt: m.createdAt?.toISOString?.(),
+      }));
+    },
+
+    async availableCredit(_, { storeId, buyerStoreId }) {
+      if (!storeId || !buyerStoreId) return 0;
+      const bp = await BusinessPartner.findOne({ store: buyerStoreId, partnerStore: storeId, isApproved: true }).lean();
+      if (!bp || (bp.creditLimit || 0) <= 0) return 0;
+      const mongoose = require("mongoose");
+      const storeObjId = mongoose.Types.ObjectId.isValid(storeId) ? new mongoose.Types.ObjectId(storeId) : null;
+      const buyerObjId = mongoose.Types.ObjectId.isValid(buyerStoreId) ? new mongoose.Types.ObjectId(buyerStoreId) : null;
+      if (!storeObjId || !buyerObjId) return bp.creditLimit || 0;
+      const used = await AccountReceivable.aggregate([
+        { $match: { store: storeObjId, buyerStore: buyerObjId, status: { $in: ["PENDING", "PARTIAL"] } } },
+        { $group: { _id: null, sum: { $sum: { $subtract: ["$amount", "$amountPaid"] } } } },
+      ]);
+      const usedSum = used[0]?.sum ?? 0;
+      return Math.max(0, (bp.creditLimit || 0) - usedSum);
+    },
   },
 
   Mutation: {
     async createUser(_, { userInput }) {
-      const { name, lastName, phone, email, password, deliveryAddress } = userInput || {};
+      const { name, lastName, phone, email, password, deliveryAddress, clientType } = userInput || {};
       if (!name || !password) throw new Error("Nombre y contraseña son obligatorios");
       if (email) {
         const existing = await User.findOne({ email: email.toLowerCase() });
@@ -533,6 +732,7 @@ const resolvers = {
         const existing = await User.findOne({ phone });
         if (existing) throw new Error("El teléfono ya está registrado");
       }
+      const ct = (clientType || "PERSONAL").toUpperCase() === "EMPRESA" ? "EMPRESA" : "PERSONAL";
       const user = await User.create({
         name,
         lastName: lastName || "",
@@ -541,6 +741,7 @@ const resolvers = {
         password,
         deliveryAddress: deliveryAddress || "",
         role: "CLIENT",
+        clientType: ct,
       });
       const token = createToken(user);
       return authPayloadFromUser(user, token);
@@ -697,23 +898,39 @@ const resolvers = {
     },
 
     async createPurchase(_, { input }) {
-      const { storeId, supplierId, items, notes, dueInDays } = input || {};
+      const { storeId, supplierId, items, notes, dueInDays, paymentCurrency } = input || {};
       if (!storeId || !supplierId || !items?.length) throw new Error("storeId, supplierId e items son obligatorios");
+      const currency = (paymentCurrency || "BCV").toUpperCase() === "CALLE" ? "CALLE" : "BCV";
+      let rateBcv = 1;
+      let rateCalle = 1;
+      if (currency === "CALLE") {
+        const latest = await ExchangeRate.findOne({ store: storeId }).sort({ createdAt: -1 }).lean();
+        if (!latest) throw new Error("Configure Tasa BCV y Tasa Calle en Configuración de Moneda antes de registrar compras en Calle");
+        rateBcv = latest.rateBcv || 1;
+        rateCalle = latest.rateCalle || 1;
+      }
       let total = 0;
       const purchaseItems = [];
       for (const it of items) {
-        const lineTotal = it.quantity * it.unitCost;
+        const unitCostInvoice = it.unitCost;
+        const realUnitCost = currency === "CALLE" ? unitCostInvoice * (rateCalle / rateBcv) : unitCostInvoice;
+        const lineTotal = it.quantity * unitCostInvoice;
         total += lineTotal;
         purchaseItems.push({
           product: it.productId,
           quantity: it.quantity,
-          unitCost: it.unitCost,
+          unitCost: unitCostInvoice,
           lot: it.lot || undefined,
           expiryDate: it.expiryDate ? new Date(it.expiryDate) : undefined,
         });
         const product = await Product.findById(it.productId);
         if (product) {
           product.stock = (product.stock || 0) + it.quantity;
+          product.costPrice = Math.round(realUnitCost * 100) / 100;
+          product.costCurrency = currency;
+          product.purchaseCurrencyType = currency === "CALLE" ? "PARALLEL" : "BCV";
+          product.isParallelRate = currency === "CALLE";
+          if (currency === "CALLE") product.rateCalleAtCost = rateCalle;
           if (it.lot) product.lot = it.lot;
           if (it.expiryDate) product.expiryDate = new Date(it.expiryDate);
           await product.save();
@@ -725,6 +942,9 @@ const resolvers = {
         items: purchaseItems,
         total: Math.round(total * 100) / 100,
         notes: notes || "",
+        paymentCurrency: currency,
+        purchaseCurrencyType: currency === "CALLE" ? "PARALLEL" : "BCV",
+        isParallelRate: currency === "CALLE",
       });
       const due = new Date();
       due.setDate(due.getDate() + (dueInDays || 30));
@@ -744,7 +964,128 @@ const resolvers = {
         items: (p.items || []).map((i) => ({ product: i.product?.toString(), quantity: i.quantity, unitCost: i.unitCost, lot: i.lot, expiryDate: i.expiryDate?.toISOString?.() })),
         total: p.total,
         purchaseDate: p.purchaseDate?.toISOString?.(),
+        paymentCurrency: p.paymentCurrency || "BCV",
         notes: p.notes,
+      };
+    },
+
+    async sendB2BMessage(_, { storeId, partnerStoreId, body }) {
+      if (!storeId || !partnerStoreId || !body?.trim()) throw new Error("storeId, partnerStoreId y body son obligatorios");
+      const existingCount = await B2BChatMessage.countDocuments({
+        $or: [
+          { fromStore: storeId, toStore: partnerStoreId },
+          { fromStore: partnerStoreId, toStore: storeId },
+        ],
+      });
+      if (existingCount === 0) {
+        const store = await Store.findById(storeId).lean();
+        const cardParts = [];
+        if (store?.name) cardParts.push(`Nombre: ${store.name}`);
+        if (store?.publicName) cardParts.push(`Tienda: ${store.publicName}`);
+        if (store?.rif) cardParts.push(`RIF: ${store.rif}`);
+        if (store?.address) cardParts.push(`Ubicación: ${store.address}`);
+        if (store?.workersCount != null) cardParts.push(`Volumen estimado: ${store.workersCount} trabajadores`);
+        const cardBody = cardParts.length ? `📋 Tarjeta de presentación\n${cardParts.join("\n")}` : "📋 Solicitud de alianza comercial";
+        await B2BChatMessage.create({
+          fromStore: storeId,
+          toStore: partnerStoreId,
+          body: cardBody,
+          isSystem: true,
+        });
+      }
+      const msg = await B2BChatMessage.create({
+        fromStore: storeId,
+        toStore: partnerStoreId,
+        body: body.trim(),
+        isSystem: false,
+      });
+      const m = await B2BChatMessage.findById(msg._id).lean();
+      return {
+        _id: m._id.toString(),
+        fromStore: m.fromStore?.toString(),
+        toStore: m.toStore?.toString(),
+        body: m.body,
+        isSystem: m.isSystem ?? false,
+        createdAt: m.createdAt?.toISOString?.(),
+      };
+    },
+
+    async requestBusinessPartner(_, { storeId, partnerStoreId }) {
+      if (!storeId || !partnerStoreId) throw new Error("storeId y partnerStoreId son obligatorios");
+      if (storeId === partnerStoreId) throw new Error("No puede solicitar alianza consigo mismo");
+      const existing = await BusinessPartner.findOne({ store: storeId, partnerStore: partnerStoreId });
+      if (existing) throw new Error("Ya existe una solicitud o alianza con esta distribuidora");
+      const partner = await BusinessPartner.create({
+        store: storeId,
+        partnerStore: partnerStoreId,
+        isApproved: false,
+      });
+      const b = await BusinessPartner.findById(partner._id).lean();
+      return {
+        _id: b._id.toString(),
+        store: b.store?.toString(),
+        partnerStore: b.partnerStore?.toString(),
+        isApproved: b.isApproved ?? false,
+        discountPercent: b.discountPercent ?? 0,
+        creditDays: b.creditDays ?? 0,
+        requestedAt: b.requestedAt?.toISOString?.(),
+        approvedAt: b.approvedAt?.toISOString?.(),
+      };
+    },
+
+    async approveBusinessPartner(_, { id, discountPercent, creditDays, creditLimit }) {
+      const bp = await BusinessPartner.findById(id);
+      if (!bp) throw new Error("Solicitud de alianza no encontrada");
+      bp.isApproved = true;
+      bp.approvedAt = new Date();
+      if (discountPercent != null) bp.discountPercent = discountPercent;
+      if (creditDays != null) bp.creditDays = creditDays;
+      if (creditLimit != null) bp.creditLimit = creditLimit;
+      await bp.save();
+      const b = await BusinessPartner.findById(id).lean();
+      return {
+        _id: b._id.toString(),
+        store: b.store?.toString(),
+        partnerStore: b.partnerStore?.toString(),
+        isApproved: b.isApproved ?? false,
+        discountPercent: b.discountPercent ?? 0,
+        creditDays: b.creditDays ?? 0,
+        creditLimit: b.creditLimit ?? 0,
+        requestedAt: b.requestedAt?.toISOString?.(),
+        approvedAt: b.approvedAt?.toISOString?.(),
+      };
+    },
+
+    async updateExchangeRates(_, { storeId, rateBcv, rateCalle }) {
+      if (!storeId || rateBcv == null || rateCalle == null) throw new Error("storeId, rateBcv y rateCalle son obligatorios");
+      const prev = await ExchangeRate.findOne({ store: storeId }).sort({ createdAt: -1 }).lean();
+      const newRate = await ExchangeRate.create({
+        store: storeId,
+        rateBcv: Number(rateBcv),
+        rateCalle: Number(rateCalle),
+      });
+      const newCalle = Number(rateCalle);
+      const products = await Product.find({ store: storeId, isParallelRate: true }).lean();
+      for (const prod of products) {
+        const oldCalle = prod.rateCalleAtCost || newCalle;
+        if (oldCalle > 0) {
+          const doc = await Product.findById(prod._id);
+          if (doc) {
+            doc.costPrice = Math.round((doc.costPrice * newCalle) / oldCalle * 100) / 100;
+            doc.rateCalleAtCost = newCalle;
+            await doc.save();
+          }
+        }
+      }
+      const rb = newRate.rateBcv || 1;
+      const rc = newRate.rateCalle || 1;
+      const differentialPercent = rb > 0 ? ((rc - rb) / rb) * 100 : 0;
+      return {
+        storeId: storeId.toString(),
+        rateBcv: rb,
+        rateCalle: rc,
+        differentialPercent: Math.round(differentialPercent * 100) / 100,
+        effectiveDate: newRate.effectiveDate?.toISOString?.(),
       };
     },
 
@@ -812,22 +1153,39 @@ const resolvers = {
 
     async bulkImportProducts(_, { storeId, products: productsInput }) {
       if (!storeId || !productsInput?.length) throw new Error("storeId y products son obligatorios");
+      let rateBcv = 1;
+      let rateCalle = 1;
+      const withCalle = productsInput.some((r) => (r.costCurrency || "").toUpperCase() === "CALLE");
+      if (withCalle) {
+        const latest = await ExchangeRate.findOne({ store: storeId }).sort({ createdAt: -1 }).lean();
+        if (latest) {
+          rateBcv = latest.rateBcv || 1;
+          rateCalle = latest.rateCalle || 1;
+        }
+      }
       let count = 0;
       for (const row of productsInput) {
         const name = row.description || row.code || "Producto";
-        const cost = Number(row.cost) || 0;
+        const costInvoice = Number(row.cost) || 0;
+        const costCurrency = (row.costCurrency || "BCV").toUpperCase() === "CALLE" ? "CALLE" : "BCV";
+        const realCost = costCurrency === "CALLE" ? costInvoice * (rateCalle / rateBcv) : costInvoice;
         const margin = Number(row.marginPercent) || 0;
         const category = row.category || "Farmacia";
-        await Product.create({
+        const payload = {
           store: storeId,
           name,
-          costPrice: cost,
+          costPrice: Math.round(realCost * 100) / 100,
           marginPercent: margin,
           stock: 0,
           category: ["Farmacia", "Repuestos"].includes(category) ? category : "Farmacia",
           external_id: row.code || undefined,
           brand: row.brand || undefined,
-        });
+          costCurrency,
+          purchaseCurrencyType: costCurrency === "CALLE" ? "PARALLEL" : "BCV",
+          isParallelRate: costCurrency === "CALLE",
+        };
+        if (costCurrency === "CALLE") payload.rateCalleAtCost = rateCalle;
+        await Product.create(payload);
         count++;
       }
       return count;

@@ -39,6 +39,7 @@ const userSchema = new mongoose.Schema(
       enum: ROLES,
       default: "CLIENT",
     },
+    clientType: { type: String, enum: ["PERSONAL", "EMPRESA"], default: "PERSONAL" },
     emailIsVerified: { type: Boolean, default: false },
     phoneIsVerified: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },

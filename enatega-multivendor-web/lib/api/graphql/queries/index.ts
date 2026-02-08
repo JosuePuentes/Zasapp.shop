@@ -1,4 +1,5 @@
 export * from "./config";
+export * from "./b2b";
 export * from "./banner";
 export * from "./cuisines";
 export * from "./restaurants";

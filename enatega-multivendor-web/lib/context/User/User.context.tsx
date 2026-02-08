@@ -87,6 +87,8 @@ export interface ProfileType {
     selected: boolean;
   }>;
   favourite: string[];
+  role?: string;
+  clientType?: string;
 }
 
 export interface OrderType {

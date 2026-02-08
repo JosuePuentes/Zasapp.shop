@@ -181,9 +181,39 @@ export default function MakeSidebar() {
           isParent: false,
         },
         {
+          text: 'Configuración de Moneda',
+          label: t('Currency Config') || 'Configuración de Moneda',
+          route: '/management/erp/currency',
+          isParent: false,
+        },
+        {
           text: 'Proveedores',
           label: t('Proveedores') || 'Proveedores',
           route: '/management/erp/suppliers',
+          isParent: false,
+        },
+        {
+          text: 'Compras',
+          label: t('Purchases') || 'Compras',
+          route: '/management/erp/purchases',
+          isParent: false,
+        },
+        {
+          text: 'Gastos',
+          label: t('Expenses') || 'Gastos',
+          route: '/management/erp/expenses',
+          isParent: false,
+        },
+        {
+          text: 'Nómina',
+          label: t('Payroll') || 'Nómina',
+          route: '/management/erp/payroll',
+          isParent: false,
+        },
+        {
+          text: 'Productos (Ficha)',
+          label: t('ERP Products') || 'Productos (Ficha)',
+          route: '/management/erp/products',
           isParent: false,
         },
         {

@@ -15,6 +15,7 @@ interface BulkRow {
   cost: number;
   marginPercent: number;
   category?: string;
+  costCurrency?: "BCV" | "CALLE";
 }
 
 function parseCSV(text: string): BulkRow[] {
@@ -31,7 +32,9 @@ function parseCSV(text: string): BulkRow[] {
     const description = row["descripcion"] ?? row["description"] ?? row["nombre"] ?? "";
     const cost = parseFloat(row["costo"] ?? row["cost"] ?? "0") || 0;
     const marginPercent = parseFloat(row["utilidad"] ?? row["marginpercent"] ?? row["margin"] ?? "0") || 0;
-    if (description) rows.push({ code: row["codigo"] ?? row["code"], description, brand: row["marca"] ?? row["brand"], cost, marginPercent, category: row["categoria"] ?? row["category"] });
+    const moneda = (row["moneda_compra"] ?? row["monedacompra"] ?? row["costcurrency"] ?? "BCV").toUpperCase();
+    const costCurrency = moneda === "CALLE" ? "CALLE" : "BCV";
+    if (description) rows.push({ code: row["codigo"] ?? row["code"], description, brand: row["marca"] ?? row["brand"], cost, marginPercent, category: row["categoria"] ?? row["category"], costCurrency });
   }
   return rows;
 }
@@ -77,6 +80,7 @@ export default function ErpProductsImportScreen() {
             cost: p.cost,
             marginPercent: p.marginPercent,
             category: p.category,
+            costCurrency: p.costCurrency,
           })),
         },
       });
@@ -89,7 +93,7 @@ export default function ErpProductsImportScreen() {
       <h1 className="text-2xl font-bold">{t("ERP.BulkImport") ?? "Carga masiva de productos (Excel/CSV)"}</h1>
       <Card>
         <p className="mb-4 text-sm text-gray-600">
-          CSV con columnas: <strong>codigo, descripcion, marca, costo, utilidad</strong> (opcional: categoria). Precio venta = Costo + Utilidad (%).
+          CSV: <strong>codigo, descripcion, marca, costo, utilidad</strong> (opcional: categoria, <strong>moneda_compra</strong> = BCV o Calle). Precio venta = Costo Real / (1 - %Utilidad).
         </p>
         <div className="flex gap-2 items-center mb-4">
           <label className="font-medium">{t("ERP.StoreId") ?? "ID Tienda"}</label>

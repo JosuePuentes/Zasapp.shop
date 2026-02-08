@@ -49,6 +49,8 @@ const storeSchema = new mongoose.Schema(
     president: { type: String, trim: true },
     workersCount: { type: Number, min: 0 },
     address: { type: String, trim: true },
+    isDistributor: { type: Boolean, default: false },
+    listPriceVisibility: { type: String, enum: ["PUBLIC_FOR_EMPRESA", "ON_REQUEST"], default: "PUBLIC_FOR_EMPRESA" },
   },
   { timestamps: true }
 );

@@ -74,3 +74,39 @@ export const CALCULATE_DELIVERY_FEE = gql`
     }
   }
 `;
+
+export const LATEST_RATES = gql`
+  query LatestRates($storeId: ID!) {
+    latestRates(storeId: $storeId) {
+      storeId
+      rateBcv
+      rateCalle
+      differentialPercent
+      effectiveDate
+    }
+  }
+`;
+
+export const SEARCH_PRODUCTS_COMPARATIVE = gql`
+  query SearchProductsComparative($buyerStoreId: ID!, $department: String, $onlyAllies: Boolean) {
+    searchProductsComparative(buyerStoreId: $buyerStoreId, department: $department, onlyAllies: $onlyAllies) {
+      _id
+      name
+      price
+      priceWithDiscount
+      costPrice
+      store {
+        _id
+        name
+        publicName
+        brandColor
+        isDistributor
+        listPriceVisibility
+      }
+      segment
+      allyDiscountPercent
+      allyCreditDays
+      allyCreditLimit
+    }
+  }
+`;

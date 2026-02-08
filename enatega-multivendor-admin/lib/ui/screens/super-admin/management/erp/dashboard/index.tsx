@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useQuery } from "@apollo/client";
-import { DASHBOARD_SALES } from "@/lib/api/graphql/queries/erp";
+import { DASHBOARD_SALES, INVENTORY_BY_COSTEO } from "@/lib/api/graphql/queries/erp";
 import { Chart } from "primereact/chart";
 import { Card } from "primereact/card";
+import { InputText } from "primereact/inputtext";
 import { useTranslations } from "next-intl";
 
 const DEFAULT_STORE_ID = "";
@@ -23,8 +24,13 @@ export default function ErpDashboardScreen() {
     variables: { storeId, from, to },
     skip: !storeId,
   });
+  const { data: costeoData } = useQuery(INVENTORY_BY_COSTEO, {
+    variables: { storeId: storeId || "none" },
+    skip: !storeId,
+  });
 
   const dashboard = data?.dashboardSales;
+  const inventoryByCosteo = costeoData?.inventoryByCosteo;
   const chartData = dashboard
     ? {
         labels: [t("Ventas Zas (Online)") ?? "Ventas Zas (Online)", t("Gastos") ?? "Gastos", t("Cuentas pagadas") ?? "Cuentas pagadas", t("Neto") ?? "Neto"],
@@ -41,9 +47,29 @@ export default function ErpDashboardScreen() {
   return (
     <div className="screen-container space-y-4">
       <h1 className="text-2xl font-bold">{t("ERP.Dashboard") ?? "Dashboard Finanzas (ERP)"}</h1>
+      <div className="flex gap-2 items-center">
+        <label className="font-medium">{t("ERP.StoreId") ?? "ID Tienda"}</label>
+        <InputText value={storeId} onChange={(e) => setStoreId(e.target.value)} placeholder="ID de la tienda" className="w-64" />
+      </div>
       <p className="text-sm text-gray-500">
-        {t("ERP.StoreIdHint") ?? "Configura storeId en la URL o selector para ver datos. Ventas Online = Zas!, Gastos y Cuentas pagadas discriminados."}
+        {t("ERP.StoreIdHint") ?? "Ventas Online = Zas!, Gastos y Cuentas pagadas discriminados. Inventario por tipo de costeo: BCV vs Tasa Calle (protegida)."}
       </p>
+      {inventoryByCosteo && (
+        <Card title="Inventario por tipo de costeo (BI)">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Productos BCV (costo legal)</p>
+              <p className="text-xl font-bold text-blue-600">{inventoryByCosteo.bcvCount}</p>
+              <p className="text-sm">Valor $ {inventoryByCosteo.bcvValue?.toFixed(2)}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Productos Tasa Calle (protegidos)</p>
+              <p className="text-xl font-bold text-amber-600">{inventoryByCosteo.parallelCount}</p>
+              <p className="text-sm">Valor $ {inventoryByCosteo.parallelValue?.toFixed(2)}</p>
+            </div>
+          </div>
+        </Card>
+      )}
       <div className="flex gap-4 flex-wrap">
         <Card className="flex-1 min-w-[200px]" title={t("Ventas Zas (Online)") ?? "Ventas Zas! (Online)"}>
           <p className="text-2xl font-bold text-green-600">${dashboard?.totalOnline?.toFixed(2) ?? "0.00"}</p>

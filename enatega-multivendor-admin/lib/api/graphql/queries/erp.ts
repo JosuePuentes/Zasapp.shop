@@ -51,6 +51,7 @@ export const PURCHASES_BY_STORE = gql`
       }
       total
       purchaseDate
+      paymentCurrency
       notes
     }
   }
@@ -112,6 +113,60 @@ export const DASHBOARD_SALES = gql`
       expenses
       accountsPaid
       net
+    }
+  }
+`;
+
+export const LATEST_RATES = gql`
+  query LatestRates($storeId: ID!) {
+    latestRates(storeId: $storeId) {
+      storeId
+      rateBcv
+      rateCalle
+      differentialPercent
+      effectiveDate
+    }
+  }
+`;
+
+export const EXCHANGE_RATES_BY_STORE = gql`
+  query ExchangeRatesByStore($storeId: ID!, $limit: Int) {
+    exchangeRatesByStore(storeId: $storeId, limit: $limit) {
+      _id
+      store
+      rateBcv
+      rateCalle
+      effectiveDate
+    }
+  }
+`;
+
+export const PRODUCTS_BY_STORE_ERP = gql`
+  query SearchProductsByStore($storeId: ID!) {
+    searchProductsByStore(storeId: $storeId) {
+      _id
+      name
+      price
+      costPrice
+      costCurrency
+      purchaseCurrencyType
+      isParallelRate
+      rateCalleAtCost
+      marginPercent
+      stock
+      category
+    }
+  }
+`;
+
+export const INVENTORY_BY_COSTEO = gql`
+  query InventoryByCosteo($storeId: ID!) {
+    inventoryByCosteo(storeId: $storeId) {
+      storeId
+      bcvCount
+      parallelCount
+      bcvValue
+      parallelValue
     }
   }
 `;

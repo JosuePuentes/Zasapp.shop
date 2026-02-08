@@ -77,6 +77,37 @@ const typeDefs = gql`
     president: String
     workersCount: Int
     address: String
+    isDistributor: Boolean
+    listPriceVisibility: String
+  }
+
+  type BusinessPartner {
+    _id: ID!
+    store: ID!
+    partnerStore: ID!
+    isApproved: Boolean!
+    discountPercent: Float
+    creditDays: Int
+    creditLimit: Float
+    requestedAt: String
+    approvedAt: String
+  }
+
+  type B2BBusinessCard {
+    storeId: ID!
+    storeName: String!
+    rif: String
+    address: String
+    estimatedVolume: String
+  }
+
+  type B2BChatMessage {
+    _id: ID!
+    fromStore: ID!
+    toStore: ID!
+    body: String!
+    isSystem: Boolean!
+    createdAt: String
   }
 
   type Supplier {
@@ -105,6 +136,9 @@ const typeDefs = gql`
     items: [PurchaseItem!]!
     total: Float!
     purchaseDate: String
+    paymentCurrency: String
+    purchaseCurrencyType: String
+    isParallelRate: Boolean
     notes: String
   }
 
@@ -150,11 +184,20 @@ const typeDefs = gql`
     _id: ID!
     name: String!
     price: Float!
+    priceWithDiscount: Float
     costPrice: Float
+    costCurrency: String
+    rateCalleAtCost: Float
+    purchaseCurrencyType: String
+    isParallelRate: Boolean
     marginPercent: Float
     stock: Int!
     category: String!
     store: Store
+    segment: String
+    allyDiscountPercent: Float
+    allyCreditDays: Int
+    allyCreditLimit: Float
     external_id: String
     brand: String
     lot: String
@@ -233,6 +276,30 @@ const typeDefs = gql`
     net: Float!
   }
 
+  type InventoryByCosteo {
+    storeId: ID!
+    bcvCount: Int!
+    parallelCount: Int!
+    bcvValue: Float!
+    parallelValue: Float!
+  }
+
+  type ExchangeRateRecord {
+    _id: ID!
+    store: ID!
+    rateBcv: Float!
+    rateCalle: Float!
+    effectiveDate: String
+  }
+
+  type LatestRates {
+    storeId: ID!
+    rateBcv: Float!
+    rateCalle: Float!
+    differentialPercent: Float!
+    effectiveDate: String
+  }
+
   input CreateUserInput {
     name: String!
     lastName: String
@@ -244,6 +311,7 @@ const typeDefs = gql`
     appleId: String
     emailIsVerified: Boolean
     isPhoneExists: Boolean
+    clientType: String
   }
 
   input StoreOnboardingInput {
@@ -280,6 +348,7 @@ const typeDefs = gql`
     storeId: ID!
     supplierId: ID!
     items: [PurchaseItemInput!]!
+    paymentCurrency: String
     notes: String
     dueInDays: Int
   }
@@ -307,6 +376,7 @@ const typeDefs = gql`
     cost: Float!
     marginPercent: Float!
     category: String
+    costCurrency: String
   }
 
   input UpdateDriverProfileInput {
@@ -342,6 +412,7 @@ const typeDefs = gql`
     addresses: [UserAddress]
     favourite: [ID]
     role: String
+    clientType: String
   }
 
   type Query {
@@ -349,6 +420,7 @@ const typeDefs = gql`
     profile: Profile
     searchProducts(department: String, clientLat: Float, clientLng: Float, firstStoreId: String): [Product!]!
     searchProductsByStore(storeId: ID!): [Product!]!
+    searchProductsComparative(buyerStoreId: ID!, department: String, onlyAllies: Boolean): [Product!]!
     storesByIds(storeIds: [ID!]!): [Store!]!
     calculateDeliveryFee(storeIds: [ID!]!, clientLat: Float!, clientLng: Float!): DeliveryFeeResult!
     configuration: Configuration
@@ -366,6 +438,14 @@ const typeDefs = gql`
     expensesByStore(storeId: ID!, from: String, to: String): [Expense!]!
     accountPayablesByStore(storeId: ID!, status: String): [AccountPayable!]!
     dashboardSales(storeId: ID!, from: String, to: String): DashboardSales
+    latestRates(storeId: ID!): LatestRates
+    exchangeRatesByStore(storeId: ID!, limit: Int): [ExchangeRateRecord!]!
+    inventoryByCosteo(storeId: ID!): InventoryByCosteo
+    businessPartnersByStore(storeId: ID!): [BusinessPartner!]!
+    businessPartnerRequests(partnerStoreId: ID!): [BusinessPartner!]!
+    b2bBusinessCard(storeId: ID!): B2BBusinessCard
+    b2bChatMessages(storeId: ID!, partnerStoreId: ID!, limit: Int): [B2BChatMessage!]!
+    availableCredit(storeId: ID!, buyerStoreId: ID!): Float!
   }
 
   type Mutation {
@@ -391,6 +471,10 @@ const typeDefs = gql`
     createExpense(input: ExpenseInput!): Expense!
     payAccountPayable(id: ID!, amount: Float!): AccountPayable!
     bulkImportProducts(storeId: ID!, products: [BulkProductInput!]!): Int!
+    updateExchangeRates(storeId: ID!, rateBcv: Float!, rateCalle: Float!): LatestRates!
+    requestBusinessPartner(storeId: ID!, partnerStoreId: ID!): BusinessPartner!
+    approveBusinessPartner(id: ID!, discountPercent: Float, creditDays: Int, creditLimit: Float): BusinessPartner!
+    sendB2BMessage(storeId: ID!, partnerStoreId: ID!, body: String!): B2BChatMessage!
   }
 `;
 

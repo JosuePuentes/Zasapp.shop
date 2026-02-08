@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
-import { SEARCH_PRODUCTS, SEARCH_PRODUCTS_BY_STORE } from "@/lib/api/graphql/queries/products";
+import { SEARCH_PRODUCTS, SEARCH_PRODUCTS_BY_STORE, LATEST_RATES } from "@/lib/api/graphql/queries/products";
 import ProductCardStore from "@/lib/ui/useable-components/product-card-store";
 import useUser from "@/lib/hooks/useUser";
 import { useConfig } from "@/lib/context/configuration/configuration.context";
@@ -35,6 +35,12 @@ export default function ProductsMarketplaceScreen() {
     skip: !sameStoreFilter,
   });
 
+  const { data: ratesData } = useQuery(LATEST_RATES, {
+    variables: { storeId: sameStoreFilter || "" },
+    skip: !sameStoreFilter,
+  });
+  const rateBcv = ratesData?.latestRates?.rateBcv ?? null;
+
   const products = sameStoreFilter ? (byStoreData?.searchProductsByStore ?? []) : (searchData?.searchProducts ?? []);
   const loading = sameStoreFilter ? byStoreLoading : searchLoading;
   const activeStoreId = sameStoreFilter || firstStoreId;
@@ -61,7 +67,7 @@ export default function ProductsMarketplaceScreen() {
       )}
 
       {sameStoreFilter && (
-        <div className="mb-4 flex items-center gap-2">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           <span className="text-sm text-gray-600 dark:text-gray-400">
             Filtro: misma tienda
           </span>
@@ -72,6 +78,11 @@ export default function ProductsMarketplaceScreen() {
           >
             Ver todos
           </button>
+          {rateBcv != null && rateBcv > 0 && (
+            <span className="text-sm font-medium text-amber-700 dark:text-amber-300 ml-auto">
+              Tasa BCV del día: {rateBcv.toFixed(2)} Bs/$
+            </span>
+          )}
         </div>
       )}
 
@@ -86,6 +97,7 @@ export default function ProductsMarketplaceScreen() {
               key={p._id}
               product={p}
               currencySymbol={CURRENCY_SYMBOL}
+              rateBcv={sameStoreFilter ? rateBcv : undefined}
               highlight={activeStoreId === p.store?._id}
             />
           ))

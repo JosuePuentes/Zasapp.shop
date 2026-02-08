@@ -28,8 +28,28 @@ export const ROUTES = [
     route: '/management/erp/dashboard',
   },
   {
+    text: 'Configuración de Moneda',
+    route: '/management/erp/currency',
+  },
+  {
     text: 'Proveedores',
     route: '/management/erp/suppliers',
+  },
+  {
+    text: 'Compras',
+    route: '/management/erp/purchases',
+  },
+  {
+    text: 'Gastos',
+    route: '/management/erp/expenses',
+  },
+  {
+    text: 'Nómina',
+    route: '/management/erp/payroll',
+  },
+  {
+    text: 'Productos (Ficha)',
+    route: '/management/erp/products',
   },
   {
     text: 'Carga masiva productos',

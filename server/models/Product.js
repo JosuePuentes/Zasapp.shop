@@ -17,16 +17,23 @@ const productSchema = new mongoose.Schema(
     brand: { type: String, trim: true },
     lot: { type: String, trim: true },
     expiryDate: { type: Date },
+    costCurrency: { type: String, enum: ["BCV", "CALLE"], default: "BCV" },
+    rateCalleAtCost: { type: Number, min: 0 },
+    purchaseCurrencyType: { type: String, enum: ["BCV", "PARALLEL"], default: "BCV" },
+    isParallelRate: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
 
 productSchema.index({ category: 1 });
 productSchema.index({ store: 1 });
+productSchema.index({ store: 1, isParallelRate: 1 });
 
-// Precio final = costo + utilidad (para uso en resolvers)
+// Precio venta contable: Precio = Costo Real / (1 - %Utilidad)
 productSchema.virtual("finalPrice").get(function () {
-  return this.costPrice * (1 + (this.marginPercent || 0) / 100);
+  const margin = (this.marginPercent || 0) / 100;
+  if (margin >= 1) return this.costPrice;
+  return this.costPrice / (1 - margin);
 });
 
 module.exports = mongoose.model("Product", productSchema);

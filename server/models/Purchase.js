@@ -19,6 +19,9 @@ const purchaseSchema = new mongoose.Schema(
     total: { type: Number, required: true, min: 0 },
     purchaseDate: { type: Date, default: Date.now },
     notes: { type: String, trim: true },
+    paymentCurrency: { type: String, enum: ["BCV", "CALLE"], default: "BCV" },
+    purchaseCurrencyType: { type: String, enum: ["BCV", "PARALLEL"], default: "BCV" },
+    isParallelRate: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

@@ -64,7 +64,20 @@ export const CREATE_PURCHASE = gql`
       }
       total
       purchaseDate
+      paymentCurrency
       notes
+    }
+  }
+`;
+
+export const UPDATE_EXCHANGE_RATES = gql`
+  mutation UpdateExchangeRates($storeId: ID!, $rateBcv: Float!, $rateCalle: Float!) {
+    updateExchangeRates(storeId: $storeId, rateBcv: $rateBcv, rateCalle: $rateCalle) {
+      storeId
+      rateBcv
+      rateCalle
+      differentialPercent
+      effectiveDate
     }
   }
 `;

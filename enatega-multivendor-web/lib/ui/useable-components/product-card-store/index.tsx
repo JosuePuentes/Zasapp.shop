@@ -25,6 +25,8 @@ export interface ProductCardStoreProps {
   highlight?: boolean;
   onClick?: () => void;
   currencySymbol?: string;
+  /** Tasa BCV del día: si se pasa, se muestra precio dual $ y Bs */
+  rateBcv?: number | null;
   className?: string;
 }
 
@@ -35,10 +37,13 @@ export default function ProductCardStore({
   highlight,
   onClick,
   currencySymbol = "$",
+  rateBcv,
   className = "",
 }: ProductCardStoreProps) {
   const publicName = storePublicName || product.store?.publicName || product.store?.name || "Tienda";
   const color = storeColor || product.store?.brandColor || "#22c55e";
+  const priceUsd = product.price ?? 0;
+  const priceBs = rateBcv != null && rateBcv > 0 ? priceUsd * rateBcv : null;
 
   return (
     <div
@@ -76,8 +81,13 @@ export default function ProductCardStore({
             />
           </div>
         )}
-        <div className="flex items-center justify-between">
-          <span className="text-secondary-color font-bold">{currencySymbol}{product.price?.toFixed(2)}</span>
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <span className="text-secondary-color font-bold">{currencySymbol}{priceUsd.toFixed(2)}</span>
+            {priceBs != null && (
+              <span className="block text-xs text-gray-500 dark:text-gray-400">Bs {priceBs.toFixed(2)}</span>
+            )}
+          </div>
           <StoreBadge publicName={publicName} brandColor={color} className="text-[10px]" />
         </div>
       </div>
