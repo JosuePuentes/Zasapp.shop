@@ -20,49 +20,26 @@ if (MONGODB_URI) {
     .catch((err) => console.error("MongoDB connection error:", err));
 }
 
-const allowedOrigins = [
-  "https://zasapp-shop.vercel.app",
-  "http://localhost:3000",
-];
+// CORS: permitir Frontend en Vercel y localhost
+const corsOptions = {
+  origin: ["https://zasapp-shop.vercel.app", "http://localhost:3000"],
+  credentials: true,
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "authorization", "userid", "isauth", "x-client-type"],
+};
+app.use(cors(corsOptions));
 
-// CORS preflight PRIMERO: responde OPTIONS /graphql con headers para que el navegador no bloquee el POST
+// Preflight OPTIONS: respuesta explícita para /graphql
 app.options("/graphql", (req, res) => {
   const origin = req.headers.origin;
-  const allowOrigin = origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
-  res.setHeader("Access-Control-Allow-Origin", allowOrigin);
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, authorization, content-type, isauth, userid, x-client-type"
-  );
+  const allow = corsOptions.origin.includes(origin) ? origin : corsOptions.origin[0];
+  res.setHeader("Access-Control-Allow-Origin", allow);
+  res.setHeader("Access-Control-Allow-Methods", corsOptions.methods.join(", "));
+  res.setHeader("Access-Control-Allow-Headers", corsOptions.allowedHeaders.join(", "));
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Max-Age", "86400");
   res.sendStatus(204);
 });
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "authorization",
-      "content-type",
-      "isauth",
-      "userid",
-      "x-client-type",
-    ],
-    credentials: true,
-    preflightContinue: false,
-  })
-);
 
 app.use(express.json());
 
@@ -78,6 +55,7 @@ const apolloServer = new ApolloServer({
 
 async function start() {
   await apolloServer.start();
+  // cors: false porque CORS ya se maneja con Express (corsOptions) arriba
   apolloServer.applyMiddleware({ app, path: "/graphql", cors: false });
 }
 
