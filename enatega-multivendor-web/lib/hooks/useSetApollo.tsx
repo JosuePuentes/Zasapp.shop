@@ -57,8 +57,18 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
     .replace(/\/graphql\/?$/, "")
     .replace(/\/?$/, "/");
 
-  // Llamamos al backend directo (Render). CORS en el backend permite zasapp-shop.vercel.app.
-  const httpUri = `${baseUrl}graphql`;
+  // Si el backend está en otro dominio (ej. Render), usar proxy same-origin para evitar CORS y "Failed to fetch"
+  const isCrossOrigin =
+    typeof window !== "undefined" &&
+    baseUrl &&
+    (() => {
+      try {
+        return new URL(baseUrl).origin !== window.location.origin;
+      } catch {
+        return false;
+      }
+    })();
+  const httpUri = isCrossOrigin ? "/api/graphql" : `${baseUrl}graphql`;
 
   const httpLink = createHttpLink({
     uri: httpUri,
