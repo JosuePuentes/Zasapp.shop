@@ -68,8 +68,9 @@ import { useTranslations } from "next-intl";
 import { onUseLocalStorage } from "@/lib/utils/methods/local-storage";
 
 export default function StoreDetailsScreen() {
-  // get the RTL direction
-  const direction = document.documentElement.getAttribute("dir") || "ltr";
+  // get the RTL direction (solo en cliente para SSR)
+  const direction =
+    (typeof document !== "undefined" && document.documentElement?.getAttribute("dir")) || "ltr";
 
   const t = useTranslations();
   // Access the UserContext via our custom hook

@@ -69,8 +69,9 @@ export default function AuthModal({
       });
     }
   }, [isAuthModalVisible]);
-  // get the RTL direction
-  const direction = document.documentElement.getAttribute("dir") || "ltr";
+  // get the RTL direction (solo en cliente para SSR)
+  const direction =
+    (typeof document !== "undefined" && document.documentElement?.getAttribute("dir")) || "ltr";
 
   // Refs
   const authenticationPanelRef = useRef(null);

@@ -47,16 +47,7 @@ export default async function RootLayout({
         {/* 🔥 Inline theme script to prevent flash of wrong theme */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                const theme = localStorage.getItem("theme");
-                if (theme === "dark") {
-                  document.documentElement.classList.add("dark");
-                } else {
-                  document.documentElement.classList.remove("dark");
-                }
-              })();
-            `,
+            __html: `(function(){if(typeof document==="undefined")return;var t=typeof localStorage!=="undefined"?localStorage.getItem("theme"):null;document.documentElement.classList.toggle("dark",t==="dark");})();`,
           }}
         />
         <Script
@@ -66,13 +57,7 @@ export default async function RootLayout({
 
         {/* Microsoft Clarity */}
         <Script id="microsoft-clarity" strategy="afterInteractive">
-          {`
-            (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "tjqw9wn955");
-          `}
+          {`(function(c,l,a,r,i,t,y){if(typeof window==="undefined"||typeof document==="undefined")return;c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","tjqw9wn955");`}
         </Script>
 
         <link rel="manifest" href="/manifest.json" />

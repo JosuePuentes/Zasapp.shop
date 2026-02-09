@@ -46,6 +46,11 @@ const AuthGuard = <T extends object>(Component: React.ComponentType<T>) => {
         const authToken = onUseLocalStorage("get", "token");
 
         if (!authToken) {
+          if (typeof document === "undefined" || typeof window === "undefined") {
+            setIsNavigating(false);
+            router.push("/");
+            return;
+          }
           const previousUrl = document.referrer;
           const isSameOrigin = previousUrl.startsWith(window.location.origin);
           const previousPath =

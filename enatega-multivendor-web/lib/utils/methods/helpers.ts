@@ -88,25 +88,27 @@ export function getStatusColor(
 }
 
 
-export function loadGoogleMapsScript(key: string): Promise<void>{
+export function loadGoogleMapsScript(key: string): Promise<void> {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return Promise.reject(new Error("loadGoogleMapsScript: browser only"));
+  }
   return new Promise((resolve, reject) => {
-    if (typeof window.google === 'object' && window.google.maps) {
-      resolve(); // already loaded
+    if (typeof window.google === "object" && window.google.maps) {
+      resolve();
       return;
     }
-    const scriptId = 'google-maps-script';
+    const scriptId = "google-maps-script";
     if (document.getElementById(scriptId)) {
-      resolve(); // already injected
+      resolve();
       return;
     }
-
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     script.id = scriptId;
     script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`;
     script.async = true;
     script.defer = true;
     script.onload = () => resolve();
-    script.onerror = () => reject('Google Maps script failed to load.');
+    script.onerror = () => reject(new Error("Google Maps script failed to load."));
     document.head.appendChild(script);
   });
 }
