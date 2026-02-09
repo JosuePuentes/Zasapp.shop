@@ -26,27 +26,26 @@ export const ConfigurationProvider = ({
 
   const configuration =
     loading || error || !data?.configuration
-      ? { currency: "", currencySymbol: "", deliveryRate: 0, costType: "perKM" }
+      ? { currency: "", currencySymbol: "", deliveryRate: 0, costType: "perKM", skipEmailVerification: true, skipMobileVerification: true, testOtp: "123456" }
       : data.configuration;
 
-  
-  const GOOGLE_CLIENT_ID = configuration.webClientID;
-  const STRIPE_PUBLIC_KEY = configuration.publishableKey;
-  const PAYPAL_KEY = configuration.clientId;
-  const GOOGLE_MAPS_KEY = configuration.googleApiKey;
-  const AMPLITUDE_API_KEY = configuration.webAmplitudeApiKey;
+  const GOOGLE_CLIENT_ID = configuration.webClientID ?? null;
+  const STRIPE_PUBLIC_KEY = configuration.publishableKey ?? null;
+  const PAYPAL_KEY = configuration.clientId ?? null;
+  const GOOGLE_MAPS_KEY = configuration.googleApiKey ?? null;
+  const AMPLITUDE_API_KEY = configuration.webAmplitudeApiKey ?? null;
   const LIBRARIES = "places,drawing,geometry".split(",") as Libraries;
   const COLORS = {
-    GOOGLE: configuration.googleColor as string,
+    GOOGLE: (configuration.googleColor as string) ?? "",
   };
-  const SENTRY_DSN = configuration.webSentryUrl;
-  const SKIP_EMAIL_VERIFICATION = configuration.skipEmailVerification;
-  const SKIP_MOBILE_VERIFICATION = configuration.skipMobileVerification;
-  const CURRENCY = configuration.currency;
-  const CURRENCY_SYMBOL = configuration.currencySymbol;
-  const DELIVERY_RATE = configuration.deliveryRate;
-  const COST_TYPE = configuration.costType;
-  const TEST_OTP = configuration.testOtp;
+  const SENTRY_DSN = configuration.webSentryUrl ?? null;
+  const SKIP_EMAIL_VERIFICATION = configuration.skipEmailVerification ?? true;
+  const SKIP_MOBILE_VERIFICATION = configuration.skipMobileVerification ?? true;
+  const CURRENCY = configuration.currency ?? "";
+  const CURRENCY_SYMBOL = configuration.currencySymbol ?? "";
+  const DELIVERY_RATE = configuration.deliveryRate ?? 0;
+  const COST_TYPE = configuration.costType ?? "perKM";
+  const TEST_OTP = configuration.testOtp ?? "123456";
 
   const FIREBASE_KEY = configuration?.firebaseKey;
   const FIREBASE_PROJECT_ID = configuration?.projectId;

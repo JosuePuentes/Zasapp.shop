@@ -50,6 +50,21 @@ app.use(
 
 app.use(express.json());
 
+// CORS preflight: el navegador envía OPTIONS antes de POST a /graphql; hay que responder 200/204 con headers
+app.options("/graphql", (req, res) => {
+  const origin = req.headers.origin;
+  if (!origin || allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin || "*");
+  }
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, authorization, content-type, isauth, userid, x-client-type"
+  );
+  res.setHeader("Access-Control-Max-Age", "86400");
+  res.sendStatus(204);
+});
+
 const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
