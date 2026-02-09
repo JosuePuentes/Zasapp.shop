@@ -26,6 +26,7 @@ import { Subscription } from "zen-observable-ts";
 
 export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
   // const { SERVER_URL, WS_SERVER_URL } = getEnv(ENV);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
   const WS_SERVER_URL = process.env.NEXT_PUBLIC_WS_SERVER_URL;
 
@@ -57,18 +58,11 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
     .replace(/\/graphql\/?$/, "")
     .replace(/\/?$/, "/");
 
-  // Si el backend está en otro dominio (ej. Render), usar proxy same-origin para evitar CORS y "Failed to fetch"
-  const isCrossOrigin =
-    typeof window !== "undefined" &&
-    baseUrl &&
-    (() => {
-      try {
-        return new URL(baseUrl).origin !== window.location.origin;
-      } catch {
-        return false;
-      }
-    })();
-  const httpUri = isCrossOrigin ? "/api/graphql" : `${baseUrl}graphql`;
+  // Prioridad: NEXT_PUBLIC_API_URL (URL completa con /graphql). Ej: https://zasapp-shop.onrender.com/graphql
+  const httpUri =
+    API_URL && API_URL.trim() !== ""
+      ? API_URL.trim().replace(/\/+$/, "") // quitar barras finales
+      : `${baseUrl}graphql`;
 
   const httpLink = createHttpLink({
     uri: httpUri,
