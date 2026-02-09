@@ -89,6 +89,8 @@ export const CREATE_USER = gql`
     $appleId: String
     $emailIsVerified: Boolean
     $isPhoneExists: Boolean
+    $clientType: String
+    $role: String
   ) {
     createUser(
       userInput: {
@@ -102,6 +104,8 @@ export const CREATE_USER = gql`
         appleId: $appleId
         emailIsVerified: $emailIsVerified
         isPhoneExists: $isPhoneExists
+        clientType: $clientType
+        role: $role
       }
     ) {
       userId

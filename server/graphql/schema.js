@@ -340,6 +340,7 @@ const typeDefs = gql`
     emailIsVerified: Boolean
     isPhoneExists: Boolean
     clientType: String
+    role: String
   }
 
   input StoreOnboardingInput {

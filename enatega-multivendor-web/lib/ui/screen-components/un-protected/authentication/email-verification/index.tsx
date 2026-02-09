@@ -115,6 +115,8 @@ export default function EmailVerification({
         password: formData?.password,
         emailIsVerified: true,
         isPhoneExists: formData?.isPhoneExists || false,
+        clientType: formData?.clientType || (formData?.registrationType === "EMPRESA" ? "EMPRESA" : "PERSONAL"),
+        role: formData?.role || (formData?.registrationType === "DRIVER" ? "DRIVER" : "CLIENT"),
       });
 
       setStoredOtp("");

@@ -10,6 +10,8 @@ export interface IAuthModalProps {
   handleModalToggle: () => void;
 }
 
+export type UserRegistrationType = "PERSONAL" | "EMPRESA" | "DRIVER";
+
 export interface IAuthFormData {
   name?: string;
   lastName?: string;
@@ -19,6 +21,10 @@ export interface IAuthFormData {
   deliveryAddress?: string;
   type?: "default" | "google";
   isPhoneExists?: boolean;
+  /** Tipo de registro: Persona Natural, Empresa (Comercio) o Driver (Delivery) */
+  registrationType?: UserRegistrationType;
+  clientType?: "PERSONAL" | "EMPRESA";
+  role?: "CLIENT" | "DRIVER";
 }
 export interface ILoginWithGoogleProps {
   googleLogin: (overrideConfig?: OverridableTokenClientConfig) => void;
@@ -203,6 +209,8 @@ export interface ICreateUserArguments {
   appleId?: string;
   emailIsVerified?: boolean;
   isPhoneExists?: boolean;
+  clientType?: string;
+  role?: string;
 }
 export interface IVerificationEmailForChangePasswordProps {
   handleSubmitAfterVerification: () => void;

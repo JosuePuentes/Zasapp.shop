@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 // Methods
 import { onUseLocalStorage } from "../utils/methods/local-storage";
 
-/** Rutas permitidas para usuario con role CLIENT (solo Marketplace, Carrito, Perfil) */
+/** Rutas permitidas para usuario con role CLIENT (Marketplace, Carrito, Perfil) */
 const CLIENT_ALLOWED_PATHS = [
   "/",
   "/profile",
@@ -23,11 +23,16 @@ const CLIENT_ALLOWED_PATHS = [
   "/privacy",
 ];
 
-function isClientAllowedPath(pathname: string): boolean {
-  const normalized = pathname.replace(/^\/(es|en)/, "") || "/";
-  return CLIENT_ALLOWED_PATHS.some(
-    (p) => normalized === p || normalized.startsWith(p + "/")
-  );
+/** Rutas permitidas para usuario con role DRIVER (panel conductor / rider) */
+const DRIVER_ALLOWED_PATHS = ["/", "/profile", "/rider", "/order", "/about", "/terms", "/privacy"];
+
+function normalizePath(pathname: string): string {
+  return pathname.replace(/^\/(es|en)/, "") || "/";
+}
+
+function isAllowedPath(pathname: string, paths: string[]): boolean {
+  const normalized = normalizePath(pathname);
+  return paths.some((p) => normalized === p || normalized.startsWith(p + "/"));
 }
 
 const AuthGuard = <T extends object>(Component: React.ComponentType<T>) => {
@@ -56,10 +61,15 @@ const AuthGuard = <T extends object>(Component: React.ComponentType<T>) => {
           return;
         }
 
-        const userRole = onUseLocalStorage("get", "userRole");
-        if (userRole === "CLIENT" && !isClientAllowedPath(pathname)) {
+        const userRole = onUseLocalStorage("get", "userRole") || "CLIENT";
+        if (userRole === "CLIENT" && !isAllowedPath(pathname, CLIENT_ALLOWED_PATHS)) {
           setIsNavigating(false);
           router.replace("/");
+          return;
+        }
+        if (userRole === "DRIVER" && !isAllowedPath(pathname, DRIVER_ALLOWED_PATHS)) {
+          setIsNavigating(false);
+          router.replace("/rider");
           return;
         }
 

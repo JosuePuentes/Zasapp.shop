@@ -10,7 +10,7 @@ import CustomPhoneTextField from "@/lib/ui/useable-components/phone-input-field"
 import PhoneConflictModal from "../phone-conflict-modal";
 
 // Interfaces
-import { ILoginWithEmailProps } from "@/lib/utils/interfaces";
+import { ILoginWithEmailProps, UserRegistrationType } from "@/lib/utils/interfaces";
 
 // Hooks
 import { useAuth } from "@/lib/context/auth/auth.context";
@@ -58,14 +58,23 @@ export default function SignUpWithEmail({
     return typeof password === "string" && password.length >= 6;
   };
 
+  const setRegistrationType = (type: UserRegistrationType) => {
+    setFormData((prev) => ({
+      ...prev,
+      registrationType: type,
+      clientType: type === "EMPRESA" ? "EMPRESA" : "PERSONAL",
+      role: type === "DRIVER" ? "DRIVER" : "CLIENT",
+    }));
+  };
+
   // Handlers
   const handleSubmit = async (isPhoneExists = false) => {
     try {
       setIsLoading(true);
       setIsRegistering(true);
 
-      // Required fields
-      if (Object.values(formData).some((val) => !val)) {
+      // Required fields (name, email, password; phone/deliveryAddress can be empty)
+      if (!formData.name?.trim() || !formData.email?.trim() || !formData.password) {
         showToast({
           type: "error",
           title: t("create_user_label"),
@@ -169,6 +178,8 @@ export default function SignUpWithEmail({
           password: formData.password,
           emailIsVerified: false,
           isPhoneExists: isPhoneExists,
+          clientType: formData.clientType || (formData.registrationType === "EMPRESA" ? "EMPRESA" : "PERSONAL"),
+          role: formData.role || (formData.registrationType === "DRIVER" ? "DRIVER" : "CLIENT"),
         });
 
         handleChangePanel(0);
@@ -197,6 +208,8 @@ export default function SignUpWithEmail({
       setIsLoading(false);
     }
   };
+  const regType = formData.registrationType || "PERSONAL";
+
   return (
     <div className="flex flex-col items-start justify-between w-full h-full dark:bg-gray-900 dark:text-gray-100">
       <PersonIcon lightColor="#000000" darkColor="#FFFFFF" />
@@ -204,9 +217,46 @@ export default function SignUpWithEmail({
         <h3 className="text-3xl font-semibold">
           {t("lets_get_you_started_label")}
         </h3>
-        {/*replace lets with let's in the translation*/}
         <p>{t("first_lets_create_your_account_message")}</p>
-        {/*replace "First" with "First," in the translation*/}
+      </div>
+      {/* Selector: Personal, Empresa (Comercio), Driver (Delivery) */}
+      <div className="flex flex-col w-full my-2">
+        <span className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">{t("registration_type_label")}</span>
+        <div className="flex gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => setRegistrationType("PERSONAL")}
+            className={`flex-1 min-w-[80px] py-2.5 px-3 rounded-lg border text-sm font-medium transition-colors ${
+              regType === "PERSONAL"
+                ? "bg-primary-color text-white border-primary-color"
+                : "bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            {t("registration_type_personal")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setRegistrationType("EMPRESA")}
+            className={`flex-1 min-w-[80px] py-2.5 px-3 rounded-lg border text-sm font-medium transition-colors ${
+              regType === "EMPRESA"
+                ? "bg-primary-color text-white border-primary-color"
+                : "bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            {t("registration_type_empresa")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setRegistrationType("DRIVER")}
+            className={`flex-1 min-w-[80px] py-2.5 px-3 rounded-lg border text-sm font-medium transition-colors ${
+              regType === "DRIVER"
+                ? "bg-primary-color text-white border-primary-color"
+                : "bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            {t("registration_type_driver")}
+          </button>
+        </div>
       </div>
       <div className="flex flex-col gap-y-1 my-3 w-full">
         <CustomTextField

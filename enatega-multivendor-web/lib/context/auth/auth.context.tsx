@@ -331,7 +331,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           setActivePanel(4);
         }
-        router.push("/");
+        const role = data?.login?.userTypeId || "CLIENT";
+        router.push(role === "DRIVER" ? "/rider" : "/");
       }
     } catch (err) {
       const error = err as ApolloError;

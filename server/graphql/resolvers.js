@@ -763,7 +763,7 @@ const resolvers = {
 
   Mutation: {
     async createUser(_, { userInput }) {
-      const { name, lastName, phone, email, password, deliveryAddress, clientType } = userInput || {};
+      const { name, lastName, phone, email, password, deliveryAddress, clientType, role: roleInput } = userInput || {};
       if (!name || !password) throw new Error("Nombre y contraseña son obligatorios");
       if (email) {
         const existing = await User.findOne({ email: email.toLowerCase() });
@@ -773,17 +773,23 @@ const resolvers = {
         const existing = await User.findOne({ phone });
         if (existing) throw new Error("El teléfono ya está registrado");
       }
+      const isDriver = (roleInput || "").toUpperCase() === "DRIVER";
+      const role = isDriver ? "DRIVER" : "CLIENT";
       const ct = (clientType || "PERSONAL").toUpperCase() === "EMPRESA" ? "EMPRESA" : "PERSONAL";
-      const user = await User.create({
+      const payload = {
         name,
         lastName: lastName || "",
         phone: phone || "",
         email: (email || "").toLowerCase(),
         password,
         deliveryAddress: deliveryAddress || "",
-        role: "CLIENT",
-        clientType: ct,
-      });
+        role,
+        clientType: isDriver ? "PERSONAL" : ct,
+      };
+      if (isDriver) {
+        payload.driverProfile = { verificationStatus: "PENDING" };
+      }
+      const user = await User.create(payload);
       const token = createToken(user);
       return authPayloadFromUser(user, token);
     },

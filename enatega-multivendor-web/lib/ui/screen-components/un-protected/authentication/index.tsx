@@ -49,6 +49,9 @@ export default function AuthModal({
     lastName: "",
     phone: "",
     deliveryAddress: "",
+    registrationType: "PERSONAL",
+    clientType: "PERSONAL",
+    role: "CLIENT",
   });
 
   useEffect(() => {
@@ -60,6 +63,9 @@ export default function AuthModal({
         lastName: "",
         phone: "",
         deliveryAddress: "",
+        registrationType: "PERSONAL",
+        clientType: "PERSONAL",
+        role: "CLIENT",
       });
     }
   }, [isAuthModalVisible]);

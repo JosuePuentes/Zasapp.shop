@@ -88,6 +88,8 @@ export default function PhoneVerification({
             name: formData?.name,
             password: formData?.password,
             isPhoneExists: formData?.isPhoneExists,
+            clientType: formData?.clientType || (formData?.registrationType === "EMPRESA" ? "EMPRESA" : "PERSONAL"),
+            role: formData?.role || (formData?.registrationType === "DRIVER" ? "DRIVER" : "CLIENT"),
           });
 
           if (!userData.phoneIsVerified) {
