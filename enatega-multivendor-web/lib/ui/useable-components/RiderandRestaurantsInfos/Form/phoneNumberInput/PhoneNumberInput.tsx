@@ -73,7 +73,7 @@ const PhoneNumberInput = () => {
         }
 
         html.dark .custom-phone-input .country-list .country.highlight {
-          background-color: #94e469 !important; /* theme green */
+          background-color: #7c3aed !important; /* theme primary */
           color: #111827 !important; /* gray-900 text */
         }
 

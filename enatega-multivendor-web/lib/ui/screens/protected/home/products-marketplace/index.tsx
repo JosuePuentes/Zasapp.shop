@@ -52,14 +52,14 @@ export default function ProductsMarketplaceScreen() {
       </h1>
 
       {firstStoreId && !sameStoreFilter && (
-        <div className="mb-4 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-          <p className="text-sm text-green-800 dark:text-green-200 mb-2">
+        <div className="mb-4 p-3 rounded-lg bg-primary-light dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800">
+          <p className="text-sm text-violet-800 dark:text-violet-200 mb-2">
             Ver más productos de esta tienda para mantener tu delivery en $1.50
           </p>
           <button
             type="button"
             onClick={() => setSameStoreFilter(firstStoreId)}
-            className="text-sm font-semibold text-green-700 dark:text-green-300 underline"
+            className="text-sm font-semibold text-primary-color dark:text-violet-300 underline"
           >
             Ver más productos de esta tienda
           </button>

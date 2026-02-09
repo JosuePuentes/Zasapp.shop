@@ -13,10 +13,14 @@
 }
 
 :root {
-  --primary-color: #75d04b;
-   --primary-light: #F3FFEE;
-   --primary-dark: #5AC12F;
-  --secondary-color: #0EA5E9;
+  /* Paleta Zas: morado, azul marino, toques dorados */
+  --primary-color: #7c3aed;
+  --primary-light: #ede9fe;
+  --primary-dark: #5b21b6;
+  --secondary-color: #1e3a5f;
+  --accent-gold: #c9a227;
+  --navy: #0f172a;
+  --navy-light: #1e293b;
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 255, 255, 255;
   --background-end-rgb: 255, 255, 255;
@@ -856,10 +860,7 @@ Discovery Caurousal
 }
 
 /* Change border color when checked */
-/* .p-checkbox-box.p-highlight {
-  border-color: green !important; 
-  background: green !important;
-} */
+/* .p-checkbox-box.p-highlight uses --primary-color */ 
 
 /* Optional: change the checkmark color */
 /* .p-checkbox-icon {
@@ -905,7 +906,7 @@ Discovery Caurousal
 }
 
  .message-left .rce-mbox-text {
-  background-color: var(--primary-color); /* Light green for current user */
+  background-color: var(--primary-color);
   border-radius: 3px;
   padding: 5px;
   color:white;

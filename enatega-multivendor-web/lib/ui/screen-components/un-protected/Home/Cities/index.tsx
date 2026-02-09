@@ -48,7 +48,7 @@ const Cities = () => {
             }
           </div>
         </>
-      : <div className="bg-green">
+      : <div className="bg-primary-color">
           <CitiesTiles
             countryId={countryId}
             AllCountries={AllCountrybuttonClick}

@@ -126,7 +126,7 @@ export default function B2BChatModal({
               type="button"
               onClick={() => requestId && approveAlliance({ variables: { id: requestId, discountPercent, creditDays, creditLimit } })}
               disabled={approving}
-              className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+              className="w-full py-2 bg-primary-color text-white rounded-lg hover:bg-primary-dark disabled:opacity-50"
             >
               {approving ? "Guardando…" : "Confirmar alianza"}
             </button>

@@ -128,7 +128,7 @@ const SideList: React.FC<SideListProps> = ({ data, onHover }) => {
 
                   <div className="flex items-center text-sm font-semibold mt-1">
                     {open ? (
-                      <span className="text-green-600">Open</span>
+                      <span className="text-primary-color">Open</span>
                     ) : (
                       <span className="text-red-600">Closed</span>
                     )}

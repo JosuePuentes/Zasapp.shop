@@ -5,7 +5,7 @@
   "description": "A Progressive Web App built with Next.js",
   "start_url": "/",
   "background_color": "#000",
-  "theme_color": "#94e469",
+  "theme_color": "#7c3aed",
   "display": "standalone",
   "orientation": "portrait",
   "categories": ["shopping", "food", "delivery"],

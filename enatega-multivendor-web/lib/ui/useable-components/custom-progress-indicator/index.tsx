@@ -14,7 +14,7 @@ const CustomLoader: React.FC<CustomProgressIndicatorComponentProps> = ({
 }) => {
   return (
     <ProgressSpinner
-      style={{ width: size, height: size, color: 'green' }}
+      style={{ width: size, height: size, color: 'var(--primary-color)' }}
       strokeWidth={strokeWidth}
       fill={'transparent'}
       animationDuration={animationDuration}

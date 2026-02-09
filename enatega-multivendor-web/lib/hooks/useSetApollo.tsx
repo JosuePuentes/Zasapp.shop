@@ -59,10 +59,24 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
     .replace(/\/?$/, "/");
 
   // Prioridad: NEXT_PUBLIC_API_URL (URL completa con /graphql). Ej: https://zasapp-shop.onrender.com/graphql
-  const httpUri =
+  const directUri =
     API_URL && API_URL.trim() !== ""
-      ? API_URL.trim().replace(/\/+$/, "") // quitar barras finales
+      ? API_URL.trim().replace(/\/+$/, "")
       : `${baseUrl}graphql`;
+
+  // Si el backend está en otro dominio (ej. Render), usar proxy same-origin para evitar CORS/OPTIONS 404
+  const isCrossOrigin =
+    typeof window !== "undefined" &&
+    directUri &&
+    (() => {
+      try {
+        const u = directUri.startsWith("http") ? directUri : `https://${window.location.host}${directUri}`;
+        return new URL(u).origin !== window.location.origin;
+      } catch {
+        return false;
+      }
+    })();
+  const httpUri = isCrossOrigin ? "/api/graphql" : directUri;
 
   const httpLink = createHttpLink({
     uri: httpUri,

@@ -29,7 +29,7 @@ const FooterLinks: React.FC<FooterLinksProps> = ({ section }) => {
                             setActiveIndex(e.index);
                         }
                     }}
-                    className="custom-accordion bg-green"
+                    className="custom-accordion bg-primary-color"
                 >
                     <AccordionTab
                         key={section.title}

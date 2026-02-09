@@ -692,7 +692,7 @@ const AppTopbar = ({ handleModalToggle }: IAppBarProps) => {
                       icon={faChevronDown}
                       width={12}
                       hanging={12}
-                      color="#94e469"
+                      color="#7c3aed"
                     />
                   </div>
                 </div>

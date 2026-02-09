@@ -150,7 +150,7 @@ export default function B2BComparativeScreen() {
                             {CURRENCY_SYMBOL}
                             {unitPrice.toFixed(2)}
                             {row.allyDiscountPercent != null && row.allyDiscountPercent > 0 && (
-                              <span className="text-xs text-green-600 dark:text-green-400 ml-1">(-{row.allyDiscountPercent}%)</span>
+                              <span className="text-xs text-primary-color dark:text-violet-400 ml-1">(-{row.allyDiscountPercent}%)</span>
                             )}
                           </td>
                           <td className="p-3 text-right">{savings === "-" ? "-" : `${savings}%`}</td>

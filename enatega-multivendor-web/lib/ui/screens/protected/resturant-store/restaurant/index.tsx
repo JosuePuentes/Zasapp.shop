@@ -662,7 +662,7 @@ export default function RestaurantDetailsScreen() {
                             type="button"
                             className={`${
                               selectedCategory === _slug
-                                ? "bg-primary-light text-primary-color dark:bg-[#2E3B23] dark:text-[#D2F29E]"
+                                ? "bg-primary-light text-primary-color dark:bg-[#1e293b] dark:text-[#c4b5fd]"
                                 : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
                             } rounded-full px-3 py-2 text-[10px] sm:text-sm md:text-base font-medium whitespace-nowrap`}
                             onClick={() => handleScroll(toSlug(category.title))}

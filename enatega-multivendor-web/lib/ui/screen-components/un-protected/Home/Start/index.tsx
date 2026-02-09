@@ -42,10 +42,17 @@ const Start: React.FC = () => {
   const t = useTranslations();
 
   return (
-    <div className="h-[100vh] w-full bg-cover bg-center flex items-center justify-center bg-primary-color relative">
-      <div className="text-center flex flex-col items-center justify-center">
+    <div
+      className="h-[100vh] w-full bg-cover bg-center flex items-center justify-center relative overflow-hidden"
+      style={{
+        background: "linear-gradient(160deg, #0f172a 0%, #1e293b 28%, #312e81 55%, #5b21b6 85%, #7c3aed 100%)",
+        boxShadow: "inset 0 0 120px rgba(0,0,0,0.25)",
+      }}
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(201,162,39,0.12),transparent)] pointer-events-none" aria-hidden />
+      <div className="text-center flex flex-col items-center justify-center relative z-10">
         <TextFlyingAnimation />
-        <h1 className="text-[40px] md:text-[90px] font-extrabold text-white">
+        <h1 className="text-[40px] md:text-[90px] font-extrabold text-white drop-shadow-lg" style={{ textShadow: "0 0 40px rgba(201,162,39,0.25)" }}>
           {t("delivered_heading")}
         </h1>
         <HomeSearch />
@@ -74,20 +81,15 @@ const Start: React.FC = () => {
         preserveAspectRatio="none"
         className="absolute bottom-0 left-0 w-full h-[100px] "
       >
-        {/* light mode */}
         <path
           d="M0,100 C500,60 500,60 1000,100 L1000,200 L0,200 Z"
           fill="white"
           className="block dark:hidden"
         />
-         {/* Dark Mode */}
-         <path
+        <path
           d="M0,100 C500,60 500,60 1000,100 L1000,200 L0,200 Z"
-          //"bg-gray-900"
-          fill="#111827"
-          
+          fill="#0f172a"
           className="hidden dark:block"
-
         />
       </svg>
 

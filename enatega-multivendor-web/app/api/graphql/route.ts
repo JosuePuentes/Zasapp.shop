@@ -3,11 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-const GRAPHQL_BACKEND = (process.env.NEXT_PUBLIC_SERVER_URL || "").replace(
-  /\/?$/,
-  "/"
-);
-const BACKEND_GRAPHQL_URL = `${GRAPHQL_BACKEND}graphql`;
+// Base del backend: SERVER_URL o extraer de API_URL (ej. https://xxx.onrender.com/graphql → https://xxx.onrender.com/)
+const SERVER_BASE =
+  (process.env.NEXT_PUBLIC_SERVER_URL || "").replace(/\/graphql\/?$/, "").replace(/\/?$/, "/") ||
+  (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/graphql\/?$/, "").replace(/\/?$/, "/");
+const BACKEND_GRAPHQL_URL = SERVER_BASE ? `${SERVER_BASE}graphql` : "";
 
 function getForwardHeaders(req: NextRequest): Record<string, string> {
   const headers: Record<string, string> = {
