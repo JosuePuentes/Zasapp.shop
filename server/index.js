@@ -25,9 +25,24 @@ const allowedOrigins = [
   "http://localhost:3000",
 ];
 
+// CORS preflight PRIMERO: responde OPTIONS /graphql con headers para que el navegador no bloquee el POST
+app.options("/graphql", (req, res) => {
+  const origin = req.headers.origin;
+  const allowOrigin = origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  res.setHeader("Access-Control-Allow-Origin", allowOrigin);
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, authorization, content-type, isauth, userid, x-client-type"
+  );
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Max-Age", "86400");
+  res.sendStatus(204);
+});
+
 app.use(
   cors({
-    origin: function (origin, callback) {
+    origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -45,25 +60,11 @@ app.use(
       "x-client-type",
     ],
     credentials: true,
+    preflightContinue: false,
   })
 );
 
 app.use(express.json());
-
-// CORS preflight: el navegador envía OPTIONS antes de POST a /graphql; hay que responder 200/204 con headers
-app.options("/graphql", (req, res) => {
-  const origin = req.headers.origin;
-  if (!origin || allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin || "*");
-  }
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, authorization, content-type, isauth, userid, x-client-type"
-  );
-  res.setHeader("Access-Control-Max-Age", "86400");
-  res.sendStatus(204);
-});
 
 const apolloServer = new ApolloServer({
   typeDefs,
