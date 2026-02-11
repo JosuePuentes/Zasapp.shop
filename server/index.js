@@ -27,19 +27,24 @@ const corsOptions = {
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "authorization", "userid", "isauth", "x-client-type"],
 };
-app.use(cors(corsOptions));
 
-// Preflight OPTIONS: respuesta explícita para /graphql
-app.options("/graphql", (req, res) => {
-  const origin = req.headers.origin;
-  const allow = corsOptions.origin.includes(origin) ? origin : corsOptions.origin[0];
-  res.setHeader("Access-Control-Allow-Origin", allow);
-  res.setHeader("Access-Control-Allow-Methods", corsOptions.methods.join(", "));
-  res.setHeader("Access-Control-Allow-Headers", corsOptions.allowedHeaders.join(", "));
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Max-Age", "86400");
-  res.sendStatus(204);
+// Mata-Errores: OPTIONS debe responder 204 antes de que Apollo/otros reciban la petición
+app.options("*", cors(corsOptions)); // Responde a OPTIONS en todas las rutas
+app.use("/graphql", (req, res, next) => {
+  if (req.method === "OPTIONS") {
+    const origin = req.headers.origin;
+    const allow = origin && corsOptions.origin.includes(origin) ? origin : corsOptions.origin[0];
+    res.setHeader("Access-Control-Allow-Origin", allow);
+    res.setHeader("Access-Control-Allow-Methods", corsOptions.methods.join(", "));
+    res.setHeader("Access-Control-Allow-Headers", corsOptions.allowedHeaders.join(", "));
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Max-Age", "86400");
+    return res.sendStatus(204);
+  }
+  next();
 });
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
