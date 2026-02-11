@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export async function GET() {
   return NextResponse.json({
     ok: true,
-    api: "enatega-multivendor-web",
+    api: "zasapp-web",
     timestamp: new Date().toISOString(),
   });
 }

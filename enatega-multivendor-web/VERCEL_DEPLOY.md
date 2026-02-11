@@ -17,6 +17,6 @@ Para que la web y la ruta **/api/graphql** funcionen bien:
 
 **Comprobar que las APIs están desplegadas**
 
-- Abre **https://zasapp-shop.vercel.app/api/health** en el navegador. Debe devolver JSON `{ "ok": true, "api": "enatega-multivendor-web", ... }`.
+- Abre **https://zasapp-shop.vercel.app/api/health** en el navegador. Debe devolver JSON `{ "ok": true, "api": "zasapp-web", ... }`.
 - Si `/api/health` devuelve 404 (página HTML), el build no está usando esta carpeta como raíz: revisa Root Directory y vuelve a desplegar.
 - Cuando `/api/health` responda bien, `/api/graphql` debería responder también.
